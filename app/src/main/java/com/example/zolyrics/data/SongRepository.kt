@@ -6,11 +6,16 @@ import com.example.zolyrics.data.remote.SupabaseService
 import kotlinx.coroutines.flow.Flow
 
 class SongRepository(
-    private val supbaseService: SupabaseService,
+    private val supabaseService: SupabaseService,
     private val songDao: SongDao
 ) {
     fun getLocalSongs(): Flow<List<Song>> {
         return songDao.getAllSongs()
+    }
+
+    suspend fun syncSongsFromRemote() {
+        val remoteSongs = supabaseService.getAllSongs()
+        songDao.insertAllSong(remoteSongs)
     }
 
 }

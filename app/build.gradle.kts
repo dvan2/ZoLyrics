@@ -1,3 +1,6 @@
+import org.jetbrains.kotlin.konan.properties.Properties
+import java.io.FileInputStream
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
@@ -10,6 +13,11 @@ android {
     namespace = "com.example.zolyrics"
     compileSdk = 35
 
+    val file = rootProject.file("local.properties")
+    val properties = Properties()
+    properties.load(FileInputStream(file))
+
+
     defaultConfig {
         applicationId = "com.example.zolyrics"
         minSdk = 30
@@ -18,6 +26,7 @@ android {
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+        buildConfigField("String", "apiKeySafe", properties.getProperty("supabase.key"))
     }
 
     buildTypes {
@@ -38,6 +47,7 @@ android {
     }
     buildFeatures {
         compose = true
+        buildConfig = true
     }
 }
 
@@ -47,8 +57,7 @@ dependencies {
     implementation("androidx.room:room-runtime:${rootProject.extra["room_version"]}")
     ksp("androidx.room:room-compiler:${rootProject.extra["room_version"]}")
     implementation("androidx.room:room-ktx:${rootProject.extra["room_version"]}")
-
-
+    implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.6.1")
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)

@@ -1,3 +1,5 @@
+import java.util.Properties
+
 pluginManagement {
     repositories {
         google {
@@ -21,4 +23,3 @@ dependencyResolutionManagement {
 
 rootProject.name = "ZoLyrics"
 include(":app")
- 
