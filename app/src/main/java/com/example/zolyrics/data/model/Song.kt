@@ -6,13 +6,15 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class LyricSection(
+data class LyricLine(
     val id: String,
     @SerialName("song_id")
     val songId: String,
     @SerialName("section_type")
     val sectionType: String,
-    val lines: List<String>
+    @SerialName("line_number")
+    val lineNumber: Int,
+    val content: String
 )
 
 @Serializable
@@ -20,8 +22,8 @@ data class SongWithLyrics(
     val id: String,
     val title: String,
     val artist: String,
-    @SerialName("lyric_sections")
-    val lyricSection: LyricSection
+    @SerialName("lyric_lines")
+    val lyricSection: List<LyricLine>
 )
 
 @Entity(tableName = "song")
