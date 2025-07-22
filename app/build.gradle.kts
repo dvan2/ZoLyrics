@@ -77,6 +77,8 @@ dependencies {
     implementation("io.ktor:ktor-client-content-negotiation:$ktorVersion")
     implementation("io.ktor:ktor-serialization-kotlinx-json:$ktorVersion")
 
+    implementation("androidx.navigation:navigation-compose:2.7.7")
+
     implementation("io.github.jan-tennert.supabase:postgrest-kt") {
         exclude(group = "io.ktor", module = "ktor-client-core-jvm")
     }

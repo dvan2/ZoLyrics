@@ -17,15 +17,6 @@ data class LyricLine(
     val content: String
 )
 
-@Serializable
-data class SongWithLyrics(
-    val id: String,
-    val title: String,
-    val artist: String,
-    @SerialName("lyric_lines")
-    val lyricSection: List<LyricLine>
-)
-
 @Entity(tableName = "song")
 @Serializable
 data class Song(

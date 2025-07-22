@@ -3,7 +3,6 @@ package com.example.zolyrics.data
 import com.example.zolyrics.data.local.SongDao
 import com.example.zolyrics.data.model.LyricLine
 import com.example.zolyrics.data.model.Song
-import com.example.zolyrics.data.model.SongWithLyrics
 import com.example.zolyrics.data.remote.SupabaseService
 import kotlinx.coroutines.flow.Flow
 
