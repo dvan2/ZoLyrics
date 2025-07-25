@@ -16,10 +16,20 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 
+sealed class LyricsUiState {
+    object Loading : LyricsUiState()
+    data class Success(val lyrics: List<LyricLine>) : LyricsUiState()
+    data class Error(val message: String) : LyricsUiState()
+}
+
 class SongViewModel (private val repository: SongRepository): ViewModel(){
     val localSongs: Flow<List<Song>> = repository.getLocalSongs()
+
+    private val _lyricsState = MutableStateFlow<LyricsUiState>(LyricsUiState.Loading)
+    val lyricsState: StateFlow<LyricsUiState> = _lyricsState
+
     private val _selectedLyrics = MutableStateFlow<List<LyricLine>>(emptyList())
-    val selectedLyrics: StateFlow<List<LyricLine>> = _selectedLyrics
+
     val favorites: Flow<List<FavoriteSong>> = repository.getFavorites()
 
     private var lastLoadedSongId: String? = null
@@ -32,17 +42,24 @@ class SongViewModel (private val repository: SongRepository): ViewModel(){
 
     fun loadLyrics(songId: String) {
         viewModelScope.launch {
-            val local = repository.getLyrics(songId).first()
+            _lyricsState.value = LyricsUiState.Loading
 
-            if (local.isNotEmpty()) {
-                _selectedLyrics.value = local
-            } else {
-                repository.loadLyricsFromSupabase(songId)
-                val updated = repository.getLyrics(songId).first()
-                _selectedLyrics.value = updated
+            try{
+                val local = repository.getLyrics(songId).first()
+
+                if (local.isNotEmpty()) {
+                    _lyricsState.value = LyricsUiState.Success(local)
+                } else {
+                    repository.loadLyricsFromSupabase(songId)
+                    val updated = repository.getLyrics(songId).first()
+                    _lyricsState.value = LyricsUiState.Success(updated)
+                }
+
+                lastLoadedSongId = songId
+            }catch (e: Exception) {
+                _lyricsState.value = LyricsUiState.Error("Failed to load lyrics: ${e.message}")
             }
 
-            lastLoadedSongId = songId
         }
     }
 

@@ -31,8 +31,10 @@ fun HomeScreen(
 
     SongListScreen(
         songs = songs,
-        viewModel = viewModel,
-        navController = navController,
+        onSongClick = { id ->
+            viewModel.loadLyrics(id)
+            navController.navigate(Screen.SongDetail.createRoute(id))
+        }
     )
 }
 
@@ -40,16 +42,14 @@ fun HomeScreen(
 @Composable
 fun SongListScreen(
     songs: List<Song>,
-    viewModel: SongViewModel,
-    navController: NavController,
+    onSongClick: (String) -> Unit,
     modifier: Modifier = Modifier
 ) {
 
     LazyColumn ( modifier = modifier){
         items(songs) { song ->
             SongCard(song, onClick = {
-                viewModel.loadLyrics(song.id)
-                navController.navigate(Screen.SongDetail.createRoute(song.id))
+                onSongClick(song.id)
             })
         }
     }

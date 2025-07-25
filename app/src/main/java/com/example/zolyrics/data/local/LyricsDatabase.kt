@@ -26,7 +26,7 @@ abstract class LyricsDatabase : RoomDatabase() {
                     LyricsDatabase::class.java,
                     "lyrics_database"
                 )
-                    .fallbackToDestructiveMigration()
+                    .fallbackToDestructiveMigration(false)
                     .build()
                 INSTANCE = instance
                 instance

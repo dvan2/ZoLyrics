@@ -5,7 +5,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.outlined.FavoriteBorder
@@ -33,6 +32,7 @@ import com.example.zolyrics.ui.navigation.Screen
 import com.example.zolyrics.ui.screens.SongScreen
 import com.example.zolyrics.ui.screens.favorites.FavoritesScreen
 import com.example.zolyrics.ui.screens.home.HomeScreen
+import com.example.zolyrics.ui.viewmodel.LyricsUiState
 import com.example.zolyrics.ui.viewmodel.SongViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -97,7 +97,7 @@ fun ZoLyricsApp() {
                 HomeScreen(navController)
             }
             composable(Screen.Favorites.route) {
-                FavoritesScreen()
+                FavoritesScreen(navController)
             }
             composable("song/{songId}") { backStackEntry->
                 val songId = backStackEntry.arguments?.getString("songId")
@@ -110,17 +110,30 @@ fun ZoLyricsApp() {
 
                 val songList = viewModel.localSongs.collectAsState(initial = emptyList()).value
                 val song = songList.find { it.id == songId }
-                val lyrics = viewModel.selectedLyrics.collectAsState().value
+                val lyricsState = viewModel.lyricsState.collectAsState().value
 
-                if (song == null) {
-                    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                        CircularProgressIndicator()
+                when {
+                    song == null -> {
+                        Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                            CircularProgressIndicator()
+                        }
                     }
-                } else {
-                    SongScreen(song = song, lyrics = lyrics)
+                    lyricsState is LyricsUiState.Loading -> {
+                        Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                            CircularProgressIndicator()
+                        }
+                    }
+
+                    lyricsState is LyricsUiState.Success -> {
+                        SongScreen(song = song, lyrics = lyricsState.lyrics)
+                    }
+
+                    lyricsState is LyricsUiState.Error -> {
+                        Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                            Text("Error: ${lyricsState.message}")
+                        }
+                    }
                 }
-
-
             }
         }
     }
@@ -128,14 +141,12 @@ fun ZoLyricsApp() {
 
 @Composable
 fun BottomNavigationBar(selectedTab: String, onTabSelected: (String) -> Unit) {
-    NavigationBar (
-
-    ){
+    NavigationBar {
         NavigationBarItem(
             selected = selectedTab == Screen.Home.route,
             onClick = { onTabSelected(Screen.Home.route) },
             icon = {
-                Icon(Icons.Default.Home, contentDescription = "Home",)
+                Icon(Icons.Default.Home, contentDescription = "Home")
             },
             label = { Text("Home") }
         )

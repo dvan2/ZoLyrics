@@ -43,10 +43,8 @@ fun SongScreen(
 
         Spacer(Modifier.height(24.dp))
 
-        // Show each section
         groupedLyrics.forEach { (section, lines) ->
             LyricsSectionDisplay(section, lines)
         }
-        Text("Lyric count: ${lyrics.size}")
     }
 }
