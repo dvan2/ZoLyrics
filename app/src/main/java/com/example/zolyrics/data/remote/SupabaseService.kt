@@ -15,11 +15,11 @@ class SupabaseService {
 
     suspend fun getLyrics(songId: String): List<LyricLine> {
         return supabase.from("lyric_lines")
-            .select{
+            .select {
                 filter {
                     eq("song_id", songId)
                 }
             }.decodeList<LyricLine>()
-
+        println("Fetched yrics from Supabase")
     }
 }

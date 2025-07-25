@@ -1,10 +1,15 @@
 package com.example.zolyrics.ui
 
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.Home
+import androidx.compose.material.icons.outlined.FavoriteBorder
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -17,6 +22,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.NavHost
@@ -35,6 +41,7 @@ fun ZoLyricsApp() {
     val navController = rememberNavController()
     val currentBackStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = currentBackStackEntry?.destination?.route
+    val viewModel: SongViewModel = viewModel(factory = SongViewModel.Factory)
 
     Scaffold (
         topBar = {
@@ -51,8 +58,25 @@ fun ZoLyricsApp() {
                 navigationIcon = {
                     if (currentRoute?.startsWith("song/") == true) {
                         IconButton(onClick = {navController.popBackStack()}) {
-                            Icon(Icons.Default.ArrowBack, contentDescription = "Back")
+                            Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
                         }
+                    }
+                },
+                actions = {
+                    if (currentRoute?.startsWith("song/") == true) {
+                        val currentSongId = currentBackStackEntry?.arguments?.getString("songId")
+                        if (currentSongId != null) {
+                            val isFavorite by viewModel.isFavorite(currentSongId).collectAsState(initial = false)
+                            IconButton(onClick = {
+                                viewModel.toggleFavorite(songId = currentSongId)
+                            }) {
+                                Icon(
+                                    imageVector = if (isFavorite) Icons.Default.Favorite else Icons.Outlined.FavoriteBorder,
+                                    contentDescription = "Favorite"
+                                )
+                            }
+                        }
+
                     }
                 }
             )
@@ -77,19 +101,25 @@ fun ZoLyricsApp() {
             }
             composable("song/{songId}") { backStackEntry->
                 val songId = backStackEntry.arguments?.getString("songId")
-                val viewModel: SongViewModel = viewModel(factory = SongViewModel.Factory)
+
+                LaunchedEffect(songId) {
+                    if (songId != null) {
+                        viewModel.loadLyrics(songId)
+                    }
+                }
 
                 val songList = viewModel.localSongs.collectAsState(initial = emptyList()).value
                 val song = songList.find { it.id == songId }
                 val lyrics = viewModel.selectedLyrics.collectAsState().value
 
-                LaunchedEffect(songId) {
-                    viewModel.loadLyrics(songId ?: "")
+                if (song == null) {
+                    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                        CircularProgressIndicator()
+                    }
+                } else {
+                    SongScreen(song = song, lyrics = lyrics)
                 }
 
-                song?.let {
-                    SongScreen(song = it, lyrics = lyrics)
-                }
 
             }
         }

@@ -7,17 +7,22 @@ import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import com.example.zolyrics.LyricsApplication
 import com.example.zolyrics.data.SongRepository
+import com.example.zolyrics.data.model.FavoriteSong
 import com.example.zolyrics.data.model.LyricLine
 import com.example.zolyrics.data.model.Song
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 
 class SongViewModel (private val repository: SongRepository): ViewModel(){
     val localSongs: Flow<List<Song>> = repository.getLocalSongs()
     private val _selectedLyrics = MutableStateFlow<List<LyricLine>>(emptyList())
     val selectedLyrics: StateFlow<List<LyricLine>> = _selectedLyrics
+    val favorites: Flow<List<FavoriteSong>> = repository.getFavorites()
+
+    private var lastLoadedSongId: String? = null
 
     init {
         viewModelScope.launch {
@@ -27,9 +32,38 @@ class SongViewModel (private val repository: SongRepository): ViewModel(){
 
     fun loadLyrics(songId: String) {
         viewModelScope.launch {
-            _selectedLyrics.value = repository.getSongsWithLyrics(songId)
+            val local = repository.getLyrics(songId).first()
+
+            if (local.isNotEmpty()) {
+                _selectedLyrics.value = local
+            } else {
+                repository.loadLyricsFromSupabase(songId)
+                val updated = repository.getLyrics(songId).first()
+                _selectedLyrics.value = updated
+            }
+
+            lastLoadedSongId = songId
         }
     }
+
+    fun isFavorite(songId: String): Flow<Boolean> {
+        return repository.isFavorite(songId)
+    }
+
+    fun toggleFavorite(songId: String) {
+        viewModelScope.launch {
+            val isFav = repository.isFavorite(songId).first()
+            val allFavs = repository.getFavorites().first()
+            println("Favorites after delete attempt: ${allFavs.map { it.songId }}")
+                if (isFav) {
+                    repository.removeFavorite(songId)
+                    println("Removed from favorites")
+                } else {
+                    repository.addFavorite(songId)
+                }
+        }
+    }
+
 
 
     companion object {

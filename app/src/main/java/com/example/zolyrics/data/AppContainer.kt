@@ -11,9 +11,11 @@ interface AppContainer {
 class AppDataContainer(context: Context) : AppContainer {
     private val database = LyricsDatabase.getDatabase(context)
     private val songDao = database.songDao()
+    private val favoriteDao = database.favoriteDao()
+    private val lyricDao = database.lyricDao()
     private val supabaseService = SupabaseService()
 
     override val songRepository: SongRepository by lazy {
-        SongRepository(supabaseService, songDao)
+        SongRepository(supabaseService, songDao, favoriteDao, lyricDao)
     }
 }
