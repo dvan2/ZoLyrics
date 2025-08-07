@@ -12,7 +12,7 @@ import com.example.zolyrics.data.model.Song
 import com.example.zolyrics.data.model.SongSet
 
 @Database(entities = [Song::class, FavoriteSong::class, LyricLine::class, SongSet::class, SetItem::class],
-    version = 4, exportSchema = false)
+    version = 5, exportSchema = false)
 abstract class LyricsDatabase : RoomDatabase() {
 
     abstract fun songDao(): SongDao
