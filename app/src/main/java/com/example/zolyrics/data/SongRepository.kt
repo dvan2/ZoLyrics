@@ -26,8 +26,7 @@ class SongRepository(
 
     suspend fun refreshSongsFromSupabase() {
         val songs = supabaseService.getAllSongs()
-        songDao.clearAll()
-        songDao.insertAllSong(songs)
+        songDao.upsertAll(songs)
     }
 
     suspend fun getSongsWithLyrics(songId: String): List<LyricLine> {

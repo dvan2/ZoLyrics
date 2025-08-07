@@ -26,7 +26,7 @@ fun FavoritesScreen (
     }
 
     SongListScreen(
-        songs = songs,
+        songs = favoriteSongs,
         onSongClick = { id ->
             viewModel.loadLyrics(id)
             navController.navigate(Screen.SongDetail.createRoute(id))

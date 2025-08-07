@@ -81,8 +81,6 @@ class SongViewModel (private val repository: SongRepository): ViewModel(){
         }
     }
 
-
-
     companion object {
         val Factory: ViewModelProvider.Factory = viewModelFactory {
             initializer {
