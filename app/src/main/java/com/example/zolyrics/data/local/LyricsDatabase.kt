@@ -8,11 +8,14 @@ import androidx.sqlite.db.SupportSQLiteDatabase
 import com.example.zolyrics.data.model.FavoriteSong
 import com.example.zolyrics.data.model.LyricLine
 import com.example.zolyrics.data.model.SetItem
+import com.example.zolyrics.data.model.SetSongKeyOverride
+import com.example.zolyrics.data.model.SetSongKeyOverrideDao
 import com.example.zolyrics.data.model.Song
 import com.example.zolyrics.data.model.SongSet
 
-@Database(entities = [Song::class, FavoriteSong::class, LyricLine::class, SongSet::class, SetItem::class],
-    version = 5, exportSchema = false)
+@Database(entities = [Song::class, FavoriteSong::class, LyricLine::class, SongSet::class, SetItem::class,
+    SetSongKeyOverride::class],
+    version = 6, exportSchema = false)
 abstract class LyricsDatabase : RoomDatabase() {
 
     abstract fun songDao(): SongDao
@@ -20,6 +23,7 @@ abstract class LyricsDatabase : RoomDatabase() {
     abstract fun lyricDao(): LyricDao
     abstract fun songSetDao(): SongSetDao
     abstract fun setItemDao(): SetItemDao
+    abstract fun setSongKeyOverrideDao(): SetSongKeyOverrideDao
 
     companion object {
         @Volatile

@@ -1,15 +1,12 @@
 package com.example.zolyrics.ui.screens.favorites
 
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.material3.Text
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.example.zolyrics.ui.navigation.Screen
-import com.example.zolyrics.ui.screens.home.SongCard
 import com.example.zolyrics.ui.screens.home.SongListScreen
 import com.example.zolyrics.ui.viewmodel.SongViewModel
 

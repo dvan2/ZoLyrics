@@ -1,13 +1,5 @@
 package com.example.zolyrics.ui
 
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.filled.Favorite
-import androidx.compose.material.icons.outlined.FavoriteBorder
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -15,23 +7,18 @@ import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.example.zolyrics.ui.navigation.Screen
 import com.example.zolyrics.ui.navigation.ZoLyricsNavHost
-import com.example.zolyrics.ui.screens.SongScreen
 import com.example.zolyrics.ui.screens.components.ZoLyricsTopBar
 import com.example.zolyrics.ui.viewmodel.SongViewModel
 
@@ -53,24 +40,7 @@ fun ZoLyricsApp() {
         bottomBar = {
             BottomNavigationBar(
                 selectedTab = currentRoute ?: Screen.Home.route,
-                onTabSelected = { route ->
-                    if (route == Screen.Sets.route) {
-                        val popped = navController.popBackStack(route, false)
-                        if (!popped) {
-                            navController.navigate(route) {
-                                popUpTo(navController.graph.startDestinationId) { saveState = true}
-                                launchSingleTop = true
-                                restoreState = true
-                            }
-                        }
-                    } else {
-                        navController.navigate(route) {
-                            popUpTo(navController.graph.startDestinationId) { saveState = true }
-                            launchSingleTop = true
-                            restoreState = true
-                        }
-                    }
-                }
+                navController = navController,
             )
         },
         floatingActionButton = {
@@ -88,18 +58,28 @@ fun ZoLyricsApp() {
 @Composable
 fun BottomNavigationBar(
     selectedTab: String,
-    onTabSelected: (String) -> Unit
+//    onTabSelected: (String) -> Unit,
+    navController: NavController
 ) {
     val bottomBarScreens = listOf(Screen.Home, Screen.Favorites, Screen.Sets)
+
 
     NavigationBar {
         bottomBarScreens.forEach { screen ->
             NavigationBarItem(
                 icon = { Icon(screen.icon, contentDescription = screen.label) },
                 label = { Text(screen.label) },
-                selected = selectedTab.startsWith(screen.route) == true,
+                selected = selectedTab == screen.route,
                 onClick = {
-                    onTabSelected(screen.route)
+                    navController.navigate(screen.route) {
+                        if (screen == Screen.Sets) {
+                            popUpTo(Screen.Sets.route) { inclusive = true }
+                        } else {
+                            popUpTo(screen.route) { inclusive = true}
+                        }
+                        launchSingleTop = true
+                        restoreState = true
+                    }
                 }
             )
         }

@@ -1,5 +1,6 @@
 package com.example.zolyrics.ui.navigation
 
+import android.util.Log
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
@@ -87,14 +88,11 @@ fun ZoLyricsNavHost(
             }
         }
 
-        composable("sets") {
+        composable(Screen.Sets.route) {
             setFabIcon(Icons.Default.Add)
             setFabClick { navController.navigate("sets/create") }
             SetListScreen(
-                onSetClick = { selectedSet ->
-                    songSetViewModel.loadSongsForSet(selectedSet.id)
-                    navController.navigate("sets/${selectedSet.id}")
-                },
+                navController = navController
             )
         }
 
@@ -111,10 +109,13 @@ fun ZoLyricsNavHost(
 
         composable("sets/{setId}") { backStackEntry ->
             val setId = backStackEntry.arguments?.getString("setId") ?: return@composable
+            LaunchedEffect(Unit) {
+                Log.d("NavDebug", "Entered set detail for $id")
+            }
             SetDetailScreen(
                 setId = setId,
                 onSongClick = { songId ->
-                    navController.navigate("song/$songId")
+                    navController.navigate(Screen.SongDetail.createRoute(songId))
                 }
             )
         }
