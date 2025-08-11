@@ -1,6 +1,5 @@
 package com.example.zolyrics.ui.navigation
 
-import android.util.Log
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
@@ -16,7 +15,6 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -27,7 +25,6 @@ import com.example.zolyrics.ui.screens.sets.CreateSetScreen
 import com.example.zolyrics.ui.screens.sets.SetDetailScreen
 import com.example.zolyrics.ui.screens.sets.SetListScreen
 import com.example.zolyrics.ui.viewmodel.LyricsUiState
-import com.example.zolyrics.ui.viewmodel.SongSetViewModel
 import com.example.zolyrics.ui.viewmodel.SongViewModel
 
 @Composable
@@ -35,7 +32,6 @@ fun ZoLyricsNavHost(
     navController: NavHostController,
     innerPadding: PaddingValues,
     viewModel: SongViewModel,
-    songSetViewModel: SongSetViewModel = viewModel(factory = SongSetViewModel.Factory),
     setFabIcon: (ImageVector?) -> Unit,
     setFabClick: ((() -> Unit)?) -> Unit
 ) {
@@ -96,22 +92,26 @@ fun ZoLyricsNavHost(
             )
         }
 
-        composable("sets/create") {
+        composable("sets/create") { backStackEntry ->
+            val saveRequests = backStackEntry.savedStateHandle
+                .getStateFlow("fab_save_request", 0L)
             var onSaveClick: (() -> Unit)? = null
             setFabIcon(Icons.Default.Check)
             setFabClick { onSaveClick?.invoke() }
             CreateSetScreen(
-                onSetCreated = { navController.popBackStack()
-                               navController.navigate("sets")},
-                onSaveClicked = { action -> onSaveClick = action }
+                fabSaveRequests = saveRequests,
+                onSetCreated = {
+                    navController.popBackStack()
+                    navController.navigate(Screen.Sets.route){
+                        launchSingleTop = true
+                        popUpTo(Screen.Sets.route) { inclusive = true}
+                    } },
             )
         }
 
         composable("sets/{setId}") { backStackEntry ->
             val setId = backStackEntry.arguments?.getString("setId") ?: return@composable
-            LaunchedEffect(Unit) {
-                Log.d("NavDebug", "Entered set detail for $id")
-            }
+
             SetDetailScreen(
                 setId = setId,
                 onSongClick = { songId ->
