@@ -1,4 +1,4 @@
-package com.example.zolyrics.data
+package com.example.zolyrics.data.repositories
 
 import com.example.zolyrics.data.local.SetItemDao
 import com.example.zolyrics.data.local.SongDao
@@ -8,8 +8,6 @@ import com.example.zolyrics.data.model.Song
 import com.example.zolyrics.data.model.SongSet
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.mapNotNull
 import java.util.UUID
 
 class UserRepository(
@@ -34,11 +32,8 @@ class UserRepository(
         }
     }
 
-    suspend fun addItemToSet(setId: String, songId: String) {
-        // figure out next position (e.g. current count)
-        val nextPos = setItemDao.getItemsForSetBlocking(setId).size
-        val item = SetItem(setId = setId, songId = songId, position = nextPos)
-        setItemDao.insertSetItem(item)
+    suspend fun deleteSetWithItems(setId: String) {
+        songSetDao.deleteSetById(setId)
     }
 
     fun getAllSets(): Flow<List<SongSet>> =
@@ -46,7 +41,7 @@ class UserRepository(
 
     fun getSongsForSet(setId: String): Flow<List<Song>> = flow {
         val setItems = setItemDao.getItemsForSetBlocking(setId)
-        val songs = setItems.mapNotNull{ item ->
+        val songs = setItems.mapNotNull { item ->
             songDao.getSongById(item.songId)
         }
         emit(songs)

@@ -6,10 +6,10 @@ import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import com.example.zolyrics.LyricsApplication
-import com.example.zolyrics.data.UserRepository
 import com.example.zolyrics.data.model.Song
 import com.example.zolyrics.data.model.SongSet
 import com.example.zolyrics.data.repositories.KeyOverrideRepository
+import com.example.zolyrics.data.repositories.UserRepository
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -58,6 +58,10 @@ class SongSetViewModel(
         }
     }
 
+    fun deleteSet(setId: String) = viewModelScope.launch {
+        repository.deleteSetWithItems(setId)
+    }
+
     fun setPreferredKeyForSong(songId: String, key: String) = viewModelScope.launch {
         val setId = _currentSetId.value ?: return@launch
         keyOverrideRepository.setPreferredKey(setId, songId, key)
@@ -97,7 +101,6 @@ class SongSetViewModel(
             }
         }
     }
-
 }
 
 data class SongInSetUi(

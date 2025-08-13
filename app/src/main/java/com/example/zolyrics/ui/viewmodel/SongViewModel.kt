@@ -6,10 +6,10 @@ import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import com.example.zolyrics.LyricsApplication
-import com.example.zolyrics.data.SongRepository
 import com.example.zolyrics.data.model.FavoriteSong
 import com.example.zolyrics.data.model.LyricLine
 import com.example.zolyrics.data.model.Song
+import com.example.zolyrics.data.repositories.SongRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow

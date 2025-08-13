@@ -1,4 +1,4 @@
-package com.example.zolyrics.data
+package com.example.zolyrics.data.repositories
 
 import com.example.zolyrics.data.local.FavoriteDao
 import com.example.zolyrics.data.local.LyricDao
@@ -19,19 +19,11 @@ class SongRepository(
         return songDao.getAllSongs()
     }
 
-    suspend fun syncSongsFromRemote() {
-        val remoteSongs = supabaseService.getAllSongs()
-        songDao.insertAllSong(remoteSongs)
-    }
-
     suspend fun refreshSongsFromSupabase() {
         val songs = supabaseService.getAllSongs()
         songDao.upsertAll(songs)
     }
 
-    suspend fun getSongsWithLyrics(songId: String): List<LyricLine> {
-        return supabaseService.getLyrics(songId)
-    }
 
     fun getLyrics(songId: String): Flow<List<LyricLine>> = lyricDao.getLyrics(songId)
 
@@ -39,8 +31,6 @@ class SongRepository(
         val remoteLyrics = supabaseService.getLyrics(songId)
         lyricDao.insertAll(remoteLyrics)
     }
-
-    suspend fun refreshAllLyrics() = lyricDao.clearAll()
 
     fun getFavorites(): Flow<List<FavoriteSong>> = favoriteDao.getAllFavorites()
     fun isFavorite(songId: String): Flow<Boolean> = favoriteDao.isFavorite(songId)

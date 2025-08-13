@@ -14,4 +14,7 @@ interface SongSetDao {
 
     @Query("SELECT * FROM song_sets WHERE userId = :userId ORDER BY createdAt DESC")
     fun getAllSetsForUser(userId: String): Flow<List<SongSet>>
+
+    @Query("DELETE FROM song_sets WHERE id = :setId")
+    suspend fun deleteSetById(setId: String)
 }

@@ -46,6 +46,8 @@ fun SetListScreen(
 
     // Local UI state
     var query by remember { mutableStateOf("") }
+    var pendingDeleteId by remember { mutableStateOf<String?>(null) }
+
     val sets = remember(allSets, query) {
         if (query.isBlank()) allSets
         else allSets.filter { it.title.contains(query, ignoreCase = true) }
@@ -102,13 +104,34 @@ fun SetListScreen(
                                 navController.navigate(Screen.SetDetail.createRoute(set.id))
                             },
                             onLongClick = {
-                                // TODO: show bottom sheet / menu (Edit, Delete)
+                                pendingDeleteId = set.id
                             }
                         )
                         .padding(vertical = 6.dp)
                 )
                 HorizontalDivider()
             }
+        }
+
+        if (pendingDeleteId != null) {
+            androidx.compose.material3.AlertDialog(
+                onDismissRequest = { pendingDeleteId = null },
+                title = { Text("Delete set?") },
+                text = { Text("This removes the set and its items. Songs themselves are not deleted.") },
+                confirmButton = {
+                    androidx.compose.material3.TextButton(
+                        onClick = {
+                            viewModel.deleteSet(pendingDeleteId!!) // implement below
+                            pendingDeleteId = null
+                        }
+                    ) { Text("Delete") }
+                },
+                dismissButton = {
+                    androidx.compose.material3.TextButton(
+                        onClick = { pendingDeleteId = null }
+                    ) { Text("Cancel") }
+                }
+            )
         }
     }
 }

@@ -12,10 +12,11 @@ import com.example.zolyrics.data.model.SetSongKeyOverride
 import com.example.zolyrics.data.model.SetSongKeyOverrideDao
 import com.example.zolyrics.data.model.Song
 import com.example.zolyrics.data.model.SongSet
+import com.example.zolyrics.data.model.UserSongKeyPref
 
 @Database(entities = [Song::class, FavoriteSong::class, LyricLine::class, SongSet::class, SetItem::class,
-    SetSongKeyOverride::class],
-    version = 6, exportSchema = false)
+    SetSongKeyOverride::class, UserSongKeyPref::class],
+    version = 7, exportSchema = false)
 abstract class LyricsDatabase : RoomDatabase() {
 
     abstract fun songDao(): SongDao
@@ -24,6 +25,7 @@ abstract class LyricsDatabase : RoomDatabase() {
     abstract fun songSetDao(): SongSetDao
     abstract fun setItemDao(): SetItemDao
     abstract fun setSongKeyOverrideDao(): SetSongKeyOverrideDao
+    abstract fun setUserSongKeyPrefDao(): UserSongKeyPrefDao
 
     companion object {
         @Volatile

@@ -4,11 +4,15 @@ import android.content.Context
 import com.example.zolyrics.data.local.LyricsDatabase
 import com.example.zolyrics.data.remote.SupabaseService
 import com.example.zolyrics.data.repositories.KeyOverrideRepository
+import com.example.zolyrics.data.repositories.SongRepository
+import com.example.zolyrics.data.repositories.UserKeyPrefRepository
+import com.example.zolyrics.data.repositories.UserRepository
 
 interface AppContainer {
     val songRepository: SongRepository
     val userRepository: UserRepository
     val overrideRepository: KeyOverrideRepository
+    val preferredKeyRepository: UserKeyPrefRepository
 }
 
 class AppDataContainer(context: Context) : AppContainer {
@@ -21,6 +25,7 @@ class AppDataContainer(context: Context) : AppContainer {
     private val songSetDao = database.songSetDao()
     private val setItemDao = database.setItemDao()
     private val overrideDao = database.setSongKeyOverrideDao()
+    private val userSongKeyPrefDao = database.setUserSongKeyPrefDao()
 
     override val songRepository: SongRepository by lazy {
         SongRepository(supabaseService, songDao, favoriteDao, lyricDao)
@@ -32,6 +37,10 @@ class AppDataContainer(context: Context) : AppContainer {
 
     override val overrideRepository: KeyOverrideRepository by lazy {
         KeyOverrideRepository(overrideDao)
+    }
+
+    override val preferredKeyRepository: UserKeyPrefRepository by lazy {
+        UserKeyPrefRepository(userSongKeyPrefDao)
     }
 
 }
