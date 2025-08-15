@@ -2,6 +2,9 @@ package com.example.zolyrics.ui.screens.sets
 
 import androidx.compose.foundation.gestures.detectDragGesturesAfterLongPress
 import androidx.compose.foundation.lazy.LazyListState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.input.pointer.pointerInput
@@ -13,12 +16,19 @@ class DragDropState(
     val onDragEnd: () -> Unit
 ) {
     var draggedItemIndex: Int? = null
-        private set
+        internal set
 
     private var accumulatedDy = 0f
 
+    var draggedKey by mutableStateOf<Any?>(null)
+        internal set
+
+    var targetIndex by mutableStateOf<Int?>(null)
+        internal set
+
     fun onDragStart(index: Int) {
         draggedItemIndex = index
+        targetIndex = index
         accumulatedDy = 0f
     }
 
@@ -26,16 +36,21 @@ class DragDropState(
         val currentIndex = draggedItemIndex ?: return
         accumulatedDy += dy
         val newIndex = indexAfterOffset(currentIndex, accumulatedDy)
-        if (newIndex != null && newIndex != currentIndex) {
-            onMove(currentIndex, newIndex)
-            draggedItemIndex = newIndex
-            accumulatedDy = 0f
+        if (newIndex != null){
+            targetIndex = newIndex
+            if (newIndex != currentIndex) {
+                onMove(currentIndex, newIndex)
+                draggedItemIndex = newIndex
+                accumulatedDy = 0f
+            }
+
         }
     }
 
     fun onDragEndOrCancel() {
         draggedItemIndex = null
         accumulatedDy = 0f
+        targetIndex = null
         onDragEnd()
     }
 

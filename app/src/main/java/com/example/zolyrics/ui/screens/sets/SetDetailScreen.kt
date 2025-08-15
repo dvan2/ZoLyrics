@@ -1,7 +1,10 @@
 package com.example.zolyrics.ui.screens.sets
 
+import androidx.compose.animation.animateColorAsState
+import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.spring
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -42,7 +45,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.hapticfeedback.HapticFeedbackType
+import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.zIndex
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.zolyrics.ui.screens.components.SongListItem
 import com.example.zolyrics.ui.viewmodel.SongSetViewModel
@@ -70,10 +76,22 @@ fun SetDetailScreen(
         DragDropState(
             listState = listState,
             onMove = { from, to -> viewModel.moveItem(from, to) },
-            onDragEnd = { viewModel.persistSetOrder() } // save new positions
+            onDragEnd = {
+                viewModel.persistSetOrder()
+            }
+
         )
     }
 
+    val haptics = LocalHapticFeedback.current
+    val anyDragging = dragState.draggedItemIndex != null
+
+    LaunchedEffect(anyDragging) {
+        if (!anyDragging) {
+            // drag just ended
+            haptics.performHapticFeedback(HapticFeedbackType.TextHandleMove)
+        }
+    }
 
     when {
         isLoading -> {
@@ -99,14 +117,46 @@ fun SetDetailScreen(
                     items = songsUi,
                     key = { _, ui -> ui.song.id }
                 ) { index, ui ->
-                    val isDragging = (index == dragState.draggedItemIndex)
-                    val scale by animateFloatAsState(if (isDragging) 1.02f else 1f, label = "drag-scale")
+                    val isDragging = index == dragState.draggedItemIndex
+                    val scale by animateFloatAsState(if (isDragging) 1.04f else 1f, label = "drag-scale")
+                    val elevation by animateDpAsState(if (isDragging) 14.dp else 2.dp, label = "drag-elev")
+                    val bg by animateColorAsState(
+                        if (isDragging) MaterialTheme.colorScheme.secondaryContainer
+                        else MaterialTheme.colorScheme.surface,
+                        label = "drag-bg"
+                    )
+                    val borderColor = MaterialTheme.colorScheme.primary
+                    val borderStroke = if (isDragging) BorderStroke(2.dp, borderColor) else null
+
+                    val placeholderHeight by animateDpAsState(
+                        if (index == dragState.targetIndex && !isDragging) 10.dp else 0.dp,
+                        label = "gap"
+                    )
+
+                    val haptics = LocalHapticFeedback.current
+
+                    LaunchedEffect(isDragging) {
+                        if (isDragging) {
+                            haptics.performHapticFeedback(HapticFeedbackType.LongPress)
+                        }
+                    }
+
+                    LaunchedEffect(dragState.targetIndex) {
+                        if (isDragging && dragState.targetIndex != null) {
+                            haptics.performHapticFeedback(HapticFeedbackType.TextHandleMove)
+                        }
+                    }
+
+                    // ✅ Show the placeholder gap above the card
+                    Spacer(Modifier.height(placeholderHeight))
 
                     Card(
+                        border = borderStroke,
                         modifier = Modifier
                             .fillMaxWidth()
                             .padding(horizontal = 12.dp, vertical = 6.dp)
                             .graphicsLayer(scaleX = scale, scaleY = scale)
+                            .zIndex(if (isDragging) 1f else 0f)
                             .animateItem(
                                 fadeInSpec = null,
                                 fadeOutSpec = null,
@@ -128,7 +178,15 @@ fun SetDetailScreen(
                             Icon(
                                 imageVector = Icons.Default.Menu,
                                 contentDescription = "Drag to reorder",
-                                modifier = Modifier.padding(start = 4.dp)
+                                modifier = Modifier
+                                    .padding(start = 4.dp)
+                                    .graphicsLayer(
+                                        rotationZ = if (isDragging) 2f else 0f,
+                                        scaleX = if (isDragging) 1.15f else 1f,
+                                        scaleY = if (isDragging) 1.15f else 1f
+                                    ),
+                                tint = if (isDragging) MaterialTheme.colorScheme.primary
+                                else MaterialTheme.colorScheme.onSurfaceVariant
                             )
 
                             SongListItem(
