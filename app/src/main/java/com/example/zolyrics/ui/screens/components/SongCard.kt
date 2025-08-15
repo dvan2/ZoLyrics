@@ -34,7 +34,6 @@ fun SongCard(song: Song,onClick: () -> Unit) {
     val globalPref = prefMap[song.id]
     val originalKey = song.key ?: "N/A"
     val effectiveKey = globalPref ?: originalKey
-    val overridden = globalPref != null && globalPref != originalKey
 
     Card(
         modifier = Modifier

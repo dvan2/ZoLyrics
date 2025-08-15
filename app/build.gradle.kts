@@ -53,6 +53,7 @@ android {
 
 dependencies {
     val ktorVersion = "3.2.0"
+    implementation(platform(libs.androidx.compose.bom))
 
     implementation("androidx.room:room-runtime:${rootProject.extra["room_version"]}")
     ksp("androidx.room:room-compiler:${rootProject.extra["room_version"]}")
@@ -62,13 +63,15 @@ dependencies {
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.activity.compose)
-    implementation(platform(libs.androidx.compose.bom))
     implementation(libs.androidx.foundation)
 
     implementation(libs.androidx.ui)
     implementation(libs.androidx.ui.graphics)
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
+
+    implementation(libs.androidx.foundation)
+
     implementation(libs.kotlinx.serialization.json)
 
     implementation(platform("io.github.jan-tennert.supabase:bom:3.2.0"))

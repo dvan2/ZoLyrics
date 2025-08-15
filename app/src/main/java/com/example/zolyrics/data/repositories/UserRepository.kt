@@ -32,6 +32,12 @@ class UserRepository(
         }
     }
 
+    suspend fun updateSetItemPositions(items: List<SetItem>) {
+        items.forEach { item ->
+            setItemDao.updatePosition(setId = item.setId, songId = item.songId, position = item.position)
+        }
+    }
+
     suspend fun deleteSetWithItems(setId: String) {
         songSetDao.deleteSetById(setId)
     }

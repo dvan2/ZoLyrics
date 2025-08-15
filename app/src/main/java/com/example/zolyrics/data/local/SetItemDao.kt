@@ -18,6 +18,14 @@ interface SetItemDao {
     @Query("SELECT * FROM set_items WHERE setId = :setId ORDER BY position")
     suspend fun getItemsForSetBlocking(setId: String): List<SetItem>
 
+    @Query("""
+    UPDATE set_items
+    SET position = :position
+    WHERE setId = :setId AND songId = :songId
+""")
+    suspend fun updatePosition(setId: String, songId: String, position: Int)
+
+
     @Delete
     suspend fun deleteSetItem(item: SetItem)
 }

@@ -29,4 +29,7 @@ interface SetSongKeyOverrideDao {
 
     @Query("DELETE FROM set_song_key_overrides WHERE setId = :setId AND songId = :songId")
     suspend fun clear(setId: String, songId: String)
+
+    @Query("SELECT * FROM set_song_key_overrides WHERE setId = :setId")
+    suspend fun getOverrides(setId: String): List<SetSongKeyOverride>
 }

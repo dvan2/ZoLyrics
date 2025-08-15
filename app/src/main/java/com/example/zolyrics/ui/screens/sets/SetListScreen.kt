@@ -36,7 +36,6 @@ import androidx.navigation.NavController
 import com.example.zolyrics.ui.navigation.Screen
 import com.example.zolyrics.ui.viewmodel.SongSetViewModel
 
-
 @Composable
 fun SetListScreen(
     viewModel: SongSetViewModel = viewModel(factory = SongSetViewModel.Factory),
@@ -44,7 +43,6 @@ fun SetListScreen(
 ) {
     val allSets by viewModel.allSets.collectAsStateWithLifecycle(initialValue = emptyList())
 
-    // Local UI state
     var query by remember { mutableStateOf("") }
     var pendingDeleteId by remember { mutableStateOf<String?>(null) }
 
@@ -80,7 +78,7 @@ fun SetListScreen(
         ) {
             items(
                 items = sets,
-                key = { it.id } // stable keys
+                key = { it.id }
             ) { set ->
                 ListItem(
                     headlineContent = {
@@ -181,7 +179,7 @@ private fun EmptyState(
         Spacer(Modifier.height(16.dp))
         OutlinedButton(onClick = onCreateClick) { Text("Create set") }
         Spacer(Modifier.height(24.dp))
-        // Optional search field stays, so users can tell it’s searchable
+
         OutlinedTextField(
             value = query,
             onValueChange = onQueryChange,

@@ -1,5 +1,6 @@
 package com.example.zolyrics.ui.screens.sets
 
+import androidx.compose.animation.core.spring
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -12,10 +13,15 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Check
+import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material3.AssistChip
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -32,6 +38,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.zolyrics.ui.screens.components.SongCard
@@ -44,18 +51,28 @@ fun SetDetailScreen(
     viewModel: SongSetViewModel = viewModel(factory = SongSetViewModel.Factory),
     onSongClick: (String) -> Unit
 ) {
-    // Trigger loading only once for this set
     LaunchedEffect(setId) {
         viewModel.loadSongsForSet(setId)
     }
 
-    val songs by viewModel.currentSetSongs.collectAsState()
+    val songs by viewModel.songsInSetUi.collectAsState()
     val isLoading by viewModel.isLoading.collectAsState()
 
     val songsUi by viewModel.songsInSetUi.collectAsState()
 
     var editingSongId by remember { mutableStateOf<String?>(null) }
     val editingUi = songsUi.firstOrNull { it.song.id == editingSongId }
+
+    val listState = rememberLazyListState()
+
+    val dragState = remember(listState, viewModel) {
+        DragDropState(
+            listState = listState,
+            onMove = { from, to -> viewModel.moveItem(from, to) },
+            onDragEnd = { viewModel.persistSetOrder() } // save new positions
+        )
+    }
+
 
     when {
         isLoading -> {
@@ -71,19 +88,56 @@ fun SetDetailScreen(
         }
 
         else -> {
-            LazyColumn {
-                items(songsUi) { ui ->
-                    SongCard(
-                        song = ui.song,
-                        onClick = { onSongClick(ui.song.id)}
-                    )
-                    SongKeyRowCompact(
-                        original = ui.originalKey,
-                        preferred = ui.preferredKey,
-                        onEditClick = { editingSongId = ui.song.id },
-                    )
+            LazyColumn(
+                state = listState,
+                modifier = Modifier
+                    .fillMaxSize()
+                    .dragDrop(dragState)
+            ) {
+                itemsIndexed(
+                    items = songsUi,
+                    key = { _, ui -> ui.song.id } // stable key is important
+                ) { index, ui ->
+                    val isDragging = (index == dragState.draggedItemIndex)
+                    Card(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 12.dp, vertical = 6.dp)
+                            .animateItem(
+                                fadeInSpec = null,
+                                fadeOutSpec = null,
+                                placementSpec = spring(stiffness = 300f)
+                            )
+                            .then(if (isDragging) Modifier
+                                .shadow(8.dp, RoundedCornerShape(12.dp))
+                            else Modifier),
+                        colors = CardDefaults.cardColors()
+                    ) {
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(8.dp),
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Icon(Icons.Default.Menu, contentDescription = "Reorder")
+
+                            Column(Modifier.weight(1f).padding(start = 8.dp)) {
+                                SongCard(
+                                    song = ui.song,
+                                    onClick = { onSongClick(ui.song.id) }
+                                )
+                                SongKeyRowCompact(
+                                    original = ui.originalKey,
+                                    preferred = ui.preferredKey,
+                                    onEditClick = { /* your bottom sheet trigger */ }
+                                )
+                            }
+                        }
+                    }
                 }
             }
+
         }
     }
 
@@ -204,4 +258,3 @@ fun SongKeyRowCompact(
         )
     }
 }
-

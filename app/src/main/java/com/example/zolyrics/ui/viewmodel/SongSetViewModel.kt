@@ -6,17 +6,14 @@ import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import com.example.zolyrics.LyricsApplication
+import com.example.zolyrics.data.model.SetItem
 import com.example.zolyrics.data.model.Song
 import com.example.zolyrics.data.model.SongSet
 import com.example.zolyrics.data.repositories.KeyOverrideRepository
 import com.example.zolyrics.data.repositories.UserRepository
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.flatMapLatest
-import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
@@ -29,19 +26,57 @@ class SongSetViewModel(
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
 
     private val _currentSetSongs = MutableStateFlow<List<Song>>(emptyList())
-    val currentSetSongs: StateFlow<List<Song>> = _currentSetSongs
 
     private val _isLoading = MutableStateFlow(false)
     val isLoading: StateFlow<Boolean> = _isLoading
 
     private val _currentSetId = MutableStateFlow<String?>(null)
 
+    private val _orderedSongs = MutableStateFlow<List<SongInSetUi>>(emptyList())
+    val songsInSetUi: StateFlow<List<SongInSetUi>> = _orderedSongs
+
+    fun persistSetOrder() {
+        viewModelScope.launch {
+            val setId = _currentSetId.value ?: return@launch
+            val updated = _orderedSongs.value.mapIndexed { index, it ->
+                SetItem(
+                    setId = setId,
+                    songId = it.song.id,
+                    position = index
+                )
+            }
+            repository.updateSetItemPositions(updated)
+        }
+    }
+
+    fun moveItem(fromIndex: Int, toIndex: Int) {
+        val current = _orderedSongs.value.toMutableList()
+        if (fromIndex in current.indices && toIndex in 0..current.size) {
+            val item = current.removeAt(fromIndex)
+            current.add(toIndex, item)
+            _orderedSongs.value = current
+        }
+    }
+
     fun loadSongsForSet(setId: String) {
         viewModelScope.launch {
             _currentSetId.value = setId
             _isLoading.value = true
+
             repository.getSongsForSet(setId).collect { songs ->
-                _currentSetSongs.value = songs
+                val overrides = keyOverrideRepository.getOverrides(setId)
+                val overrideMap = overrides.associateBy { it.songId }
+
+                val items = songs.map { s ->
+                    val o = overrideMap[s.id]
+                    SongInSetUi(
+                        song = s,
+                        originalKey = s.key.orEmpty(),
+                        preferredKey = o?.preferredKey
+                    )
+                }
+
+                _orderedSongs.value = items
                 _isLoading.value = false
             }
         }
@@ -71,24 +106,6 @@ class SongSetViewModel(
         val setId = _currentSetId.value ?: return@launch
         keyOverrideRepository.clearPreferredKey(setId, songId)
     }
-
-
-    @OptIn(ExperimentalCoroutinesApi::class)
-    val songsInSetUi: StateFlow<List<SongInSetUi>> =
-        combine(currentSetSongs, _currentSetId.flatMapLatest { setId ->
-            if (setId != null) keyOverrideRepository.observeOverrides(setId)
-            else flowOf(emptyList())
-        }) { songs, overrides ->
-            val map = overrides.associateBy { it.songId }
-            songs.map { s ->
-                val o = map[s.id]
-                SongInSetUi(
-                    song = s,
-                    originalKey = s.key.orEmpty(),
-                    preferredKey = o?.preferredKey,
-                )
-            }
-        }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
 
 
     companion object {

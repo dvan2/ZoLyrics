@@ -11,6 +11,10 @@ class KeyOverrideRepository(
 
     suspend fun getOverride(setId: String, songId: String) = dao.getOverride(setId, songId)
 
+    suspend fun getOverrides(setId: String): List<SetSongKeyOverride> {
+        return dao.getOverrides(setId)
+    }
+
     suspend fun setPreferredKey(setId: String, songId: String, key: String) =
         dao.upsert(SetSongKeyOverride(setId, songId, key))
 
