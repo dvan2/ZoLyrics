@@ -1,5 +1,6 @@
 package com.example.zolyrics.ui.screens.sets
 
+import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.spring
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -8,6 +9,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
@@ -39,9 +41,10 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.example.zolyrics.ui.screens.components.SongCard
+import com.example.zolyrics.ui.screens.components.SongListItem
 import com.example.zolyrics.ui.viewmodel.SongSetViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -55,10 +58,8 @@ fun SetDetailScreen(
         viewModel.loadSongsForSet(setId)
     }
 
-    val songs by viewModel.songsInSetUi.collectAsState()
-    val isLoading by viewModel.isLoading.collectAsState()
-
     val songsUi by viewModel.songsInSetUi.collectAsState()
+    val isLoading by viewModel.isLoading.collectAsState()
 
     var editingSongId by remember { mutableStateOf<String?>(null) }
     val editingUi = songsUi.firstOrNull { it.song.id == editingSongId }
@@ -81,7 +82,7 @@ fun SetDetailScreen(
             }
         }
 
-        songs.isEmpty() -> {
+        songsUi.isEmpty() -> {
             Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                 Text("No songs found in this set.")
             }
@@ -96,43 +97,48 @@ fun SetDetailScreen(
             ) {
                 itemsIndexed(
                     items = songsUi,
-                    key = { _, ui -> ui.song.id } // stable key is important
+                    key = { _, ui -> ui.song.id }
                 ) { index, ui ->
                     val isDragging = (index == dragState.draggedItemIndex)
+                    val scale by animateFloatAsState(if (isDragging) 1.02f else 1f, label = "drag-scale")
+
                     Card(
                         modifier = Modifier
                             .fillMaxWidth()
                             .padding(horizontal = 12.dp, vertical = 6.dp)
+                            .graphicsLayer(scaleX = scale, scaleY = scale)
                             .animateItem(
                                 fadeInSpec = null,
                                 fadeOutSpec = null,
                                 placementSpec = spring(stiffness = 300f)
                             )
-                            .then(if (isDragging) Modifier
-                                .shadow(8.dp, RoundedCornerShape(12.dp))
-                            else Modifier),
+                            .then(
+                                if (isDragging) Modifier.shadow(8.dp, RoundedCornerShape(12.dp))
+                                else Modifier
+                            ),
                         colors = CardDefaults.cardColors()
                     ) {
                         Row(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .padding(8.dp),
-                            horizontalArrangement = Arrangement.SpaceBetween,
+                                .padding(10.dp),
+                            horizontalArrangement = Arrangement.spacedBy(12.dp),
                             verticalAlignment = Alignment.CenterVertically
                         ) {
-                            Icon(Icons.Default.Menu, contentDescription = "Reorder")
+                            Icon(
+                                imageVector = Icons.Default.Menu,
+                                contentDescription = "Drag to reorder",
+                                modifier = Modifier.padding(start = 4.dp)
+                            )
 
-                            Column(Modifier.weight(1f).padding(start = 8.dp)) {
-                                SongCard(
-                                    song = ui.song,
-                                    onClick = { onSongClick(ui.song.id) }
-                                )
-                                SongKeyRowCompact(
-                                    original = ui.originalKey,
-                                    preferred = ui.preferredKey,
-                                    onEditClick = { /* your bottom sheet trigger */ }
-                                )
-                            }
+                            SongListItem(
+                                song = ui.song,
+                                original = ui.originalKey,
+                                preferred = ui.preferredKey,
+                                onSongClick = { onSongClick(ui.song.id) },
+                                onEditClick = { editingSongId = ui.song.id },
+                                modifier = Modifier.weight(1f)
+                            )
                         }
                     }
                 }
@@ -175,7 +181,7 @@ fun KeyPickerSheet(
         Column(Modifier.padding(16.dp)) {
             Text("Choose preferred key", style = MaterialTheme.typography.titleMedium)
 
-            Spacer(Modifier.padding(top = 12.dp))
+            Spacer(Modifier.height(12.dp))
 
             // Grid of keys
             LazyVerticalGrid(
@@ -235,7 +241,7 @@ fun SongKeyRowCompact(
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(horizontal = 16.dp, vertical = 6.dp),
+            .padding(top = 6.dp),
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
         Column {
@@ -246,7 +252,8 @@ fun SongKeyRowCompact(
             if (preferred != null && preferred != original) {
                 Text(
                     text = "(orig. $safeOriginal)",
-                    style = MaterialTheme.typography.bodySmall
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
             }
         }

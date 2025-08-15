@@ -25,8 +25,6 @@ class SongSetViewModel(
     val allSets: StateFlow<List<SongSet>> = repository.getAllSets()
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
 
-    private val _currentSetSongs = MutableStateFlow<List<Song>>(emptyList())
-
     private val _isLoading = MutableStateFlow(false)
     val isLoading: StateFlow<Boolean> = _isLoading
 
@@ -100,11 +98,19 @@ class SongSetViewModel(
     fun setPreferredKeyForSong(songId: String, key: String) = viewModelScope.launch {
         val setId = _currentSetId.value ?: return@launch
         keyOverrideRepository.setPreferredKey(setId, songId, key)
+
+        _orderedSongs.value = _orderedSongs.value.map { ui ->
+            if (ui.song.id == songId) ui.copy(preferredKey = key) else ui
+        }
     }
 
     fun clearPreferredKeyForSong(songId: String) = viewModelScope.launch {
         val setId = _currentSetId.value ?: return@launch
         keyOverrideRepository.clearPreferredKey(setId, songId)
+
+        _orderedSongs.value = _orderedSongs.value.map { ui ->
+            if (ui.song.id == songId) ui.copy(preferredKey = null) else ui
+        }
     }
 
 
