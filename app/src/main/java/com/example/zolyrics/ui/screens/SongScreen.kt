@@ -43,7 +43,7 @@ fun SongScreen(
     {
         SongHeaderWithPref(
             title = song.title,
-            artist = song.artist,
+            artist = song.artistName,
             bpm = song.bpm,
             originalKey = song.key ?: "N/A",
             globalPreferredKey = globalPrefFortThisSong,

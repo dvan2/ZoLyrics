@@ -68,7 +68,7 @@ fun CreateSetScreen(
                 val isSelected = song in selectedSongs
                 ListItem(
                     headlineContent  = { Text(song.title) },
-                    supportingContent = { Text(song.artist) },
+                    supportingContent = { Text(song.artistName) },
                     modifier = Modifier
                         .fillMaxWidth()
                         .clickable {

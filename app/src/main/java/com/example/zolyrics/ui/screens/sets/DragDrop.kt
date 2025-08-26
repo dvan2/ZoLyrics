@@ -20,9 +20,6 @@ class DragDropState(
 
     private var accumulatedDy = 0f
 
-    var draggedKey by mutableStateOf<Any?>(null)
-        internal set
-
     var targetIndex by mutableStateOf<Int?>(null)
         internal set
 
@@ -72,9 +69,7 @@ class DragDropState(
     }
 }
 
-internal fun Modifier.dragDrop(
-    state: DragDropState
-) = pointerInput(state) {
+internal fun Modifier.dragDrop(state: DragDropState) = pointerInput(state) {
     detectDragGesturesAfterLongPress(
         onDragStart = { offset: Offset ->
             // Map pointer Y (relative to this LazyColumn) to an item index

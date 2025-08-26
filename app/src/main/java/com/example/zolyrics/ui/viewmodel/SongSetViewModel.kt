@@ -11,6 +11,7 @@ import com.example.zolyrics.data.model.Song
 import com.example.zolyrics.data.model.SongSet
 import com.example.zolyrics.data.repositories.KeyOverrideRepository
 import com.example.zolyrics.data.repositories.UserRepository
+import com.example.zolyrics.ui.model.SongInSetContract
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -49,6 +50,8 @@ class SongSetViewModel(
 
     fun moveItem(fromIndex: Int, toIndex: Int) {
         val current = _orderedSongs.value.toMutableList()
+
+        //ensure valid index
         if (fromIndex in current.indices && toIndex in 0..current.size) {
             val item = current.removeAt(fromIndex)
             current.add(toIndex, item)
@@ -113,7 +116,6 @@ class SongSetViewModel(
         }
     }
 
-
     companion object {
         val Factory: ViewModelProvider.Factory = viewModelFactory {
             initializer {
@@ -127,7 +129,9 @@ class SongSetViewModel(
 }
 
 data class SongInSetUi(
-    val song: Song,
-    val originalKey: String,
-    val preferredKey: String?,
-)
+    override val song: Song,
+    override val originalKey: String?,
+    override val preferredKey: String?,
+): SongInSetContract {
+    override val songId: String get() = song.id
+}

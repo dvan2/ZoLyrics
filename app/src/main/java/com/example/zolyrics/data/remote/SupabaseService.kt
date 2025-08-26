@@ -2,15 +2,30 @@ package com.example.zolyrics.data.remote
 
 import com.example.zolyrics.data.model.LyricLine
 import com.example.zolyrics.data.model.Song
+import com.example.zolyrics.data.remote.dto.RemoteSongRow
 import io.github.jan.supabase.postgrest.from
 
 class SupabaseService {
     private val supabase = SupabaseClientProvider.client
 
     suspend fun getAllSongs(): List<Song> {
-        return supabase.from("songs")
+//        return supabase.from("songs")
+//            .select()
+//            .decodeList()
+        val rows: List<RemoteSongRow> = supabase
+            .from("song_with_first_artist")   // ← your Supabase view
             .select()
             .decodeList()
+
+        return rows.map { r ->
+            Song(
+                id = r.id,
+                title = r.title,
+                artistName = r.artistName.orEmpty(),
+                bpm = r.bpm,
+                key = r.key
+            )
+        }
     }
 
     suspend fun getLyrics(songId: String): List<LyricLine> {
@@ -20,6 +35,5 @@ class SupabaseService {
                     eq("song_id", songId)
                 }
             }.decodeList<LyricLine>()
-        println("Fetched yrics from Supabase")
     }
 }

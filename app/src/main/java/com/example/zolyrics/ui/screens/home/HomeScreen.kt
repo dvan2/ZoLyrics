@@ -45,7 +45,7 @@ fun HomeScreen(
         if (q.isEmpty()) songs
         else songs.filter { s ->
             s.title.contains(q, ignoreCase = true) ||
-                    s.artist.contains(q, ignoreCase = true)
+                    s.artistName.contains(q, ignoreCase = true)
         }
     }
 

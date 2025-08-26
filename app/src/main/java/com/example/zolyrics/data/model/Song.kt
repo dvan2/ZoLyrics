@@ -25,7 +25,8 @@ data class Song(
     @PrimaryKey
     val id: String,
     val title: String,
-    val artist: String,
+    val artistId: String? = null,
+    val artistName: String = "",
     val bpm: Int? = 100,
     val key: String? = "C"
 )
