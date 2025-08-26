@@ -37,7 +37,7 @@ fun SongHeaderWithPref(
     Column {
         Text(title, style = MaterialTheme.typography.titleLarge)
         Text("by $artist", style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
-        Spacer(Modifier.height(spacing.sm))
+        Spacer(Modifier.height(LocalSpacing.current.md))
         val meta = buildString {
             (bpm ?: 0).takeIf { it > 0 }?.let { append("BPM $it") }
             val effective = globalPreferredKey ?: originalKey

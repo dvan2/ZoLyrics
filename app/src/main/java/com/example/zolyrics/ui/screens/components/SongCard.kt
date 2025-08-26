@@ -139,7 +139,6 @@ fun SongCard(
 
             Spacer(Modifier.width(12.dp))
 
-            // Title + artist (+ optional transposition hint)
             Column(
                 modifier = Modifier.weight(1f),
                 verticalArrangement = Arrangement.Center
@@ -170,7 +169,6 @@ fun SongCard(
 
             Spacer(Modifier.width(12.dp))
 
-            // Right-side metadata (Key only — BPM removed)
             Row(verticalAlignment = Alignment.CenterVertically) {
                 if (effectiveKey.isNotBlank()) {
                     AssistChip(
