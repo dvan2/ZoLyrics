@@ -10,7 +10,7 @@ plugins {
 }
 
 android {
-    namespace = "com.example.zolyrics"
+    namespace = "com.dvan.zolyrics"
     compileSdk = 35
 
     val file = rootProject.file("local.properties")
@@ -19,7 +19,7 @@ android {
 
 
     defaultConfig {
-        applicationId = "com.example.zolyrics"
+        applicationId = "com.dvan.zolyrics"
         minSdk = 30
         targetSdk = 35
         versionCode = 1
