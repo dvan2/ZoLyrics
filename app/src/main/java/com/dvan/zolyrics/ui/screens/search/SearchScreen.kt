@@ -1,165 +1,125 @@
 package com.dvan.zolyrics.ui.screens.search
 
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material.icons.filled.Close
-import androidx.compose.material3.CenterAlignedTopAppBar
-import androidx.compose.material3.Divider
-import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.dvan.zolyrics.data.model.Song
-import com.dvan.zolyrics.ui.viewmodel.SongViewModel
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SearchScreen(
     onBack: () -> Unit,
     onOpenSong: (String) -> Unit,
-    songViewModel: SongViewModel = viewModel(factory = SongViewModel.Factory)
+    searchViewModel: SearchViewModel = viewModel(factory = SearchViewModel.Factory)
 ) {
-    val allSongs by songViewModel.localSongs.collectAsState(initial = emptyList())
+    val query = searchViewModel.query
+    val results = searchViewModel.results
 
-    var query by remember { mutableStateOf("") }
-    var results by remember { mutableStateOf<List<Song>>(emptyList()) }
-    var debounceJob by remember { mutableStateOf<Job?>(null) }
-    val scope = rememberCoroutineScope()
-
-    // Simple debounce on query changes
-    LaunchedEffect(query, allSongs) {
-        debounceJob?.cancel()
-        debounceJob = scope.launch {
-            delay(250) // debounce window
-            results = if (query.isBlank()) {
-                emptyList()
-            } else {
-                val q = query.trim().lowercase()
-                allSongs.filter { s ->
-                    s.title.lowercase().contains(q)
-                }.take(100)
-            }
-        }
-    }
-
-    Scaffold(
-        topBar = {
-            CenterAlignedTopAppBar(
-                title = {
-                    Text(
-                        if (query.isBlank()) "Search" else "Search (${results.size})"
-                    )
-                },
-                navigationIcon = {
-                    IconButton(onClick = onBack) {
-                        Icon(Icons.Filled.ArrowBack, contentDescription = "Back")
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(horizontal = 16.dp, vertical = 12.dp)
+    ) {
+        // Search bar
+        OutlinedTextField(
+            value = query,
+            onValueChange = searchViewModel::onQueryChange,
+            label = { Text("Search lyrics, title, or artist") },
+            singleLine = true,
+            trailingIcon = {
+                if (query.isNotEmpty()) {
+                    IconButton(onClick = { searchViewModel.onQueryChange("") }) {
+                        Icon(Icons.Filled.Clear, contentDescription = "Clear")
                     }
                 }
-            )
-        }
-    ) { inner ->
-        Column(
+            },
             modifier = Modifier
-                .fillMaxSize()
-                .padding(inner)
-        ) {
-            // Search field
-            OutlinedTextField(
-                value = query,
-                onValueChange = { query = it },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 16.dp, vertical = 8.dp),
-                placeholder = { Text("Search by title or artist") },
-                singleLine = true,
-                trailingIcon = {
-                    if (query.isNotEmpty()) {
-                        IconButton(onClick = { query = "" }) {
-                            Icon(Icons.Filled.Close, contentDescription = "Clear")
-                        }
-                    }
-                }
-            )
+                .fillMaxWidth()
+        )
 
-            // Results
-            if (query.isNotBlank() && results.isEmpty()) {
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(24.dp)
-                ) {
-                    Text("No matches. Try a different word or check spelling.")
-                }
-            } else {
-                LazyColumn(
-                    modifier = Modifier.fillMaxSize(),
-                    contentPadding = PaddingValues(vertical = 8.dp)
-                ) {
-                    items(results) { song ->
-                        ResultRow(
-                            song = song,
-                            onClick = { onOpenSong(song.id) }
-                        )
-                    }
-                }
+        Spacer(modifier = Modifier.height(12.dp))
+
+        // Optional: show number of results
+        if (query.isNotBlank()) {
+            Text(
+                text = "${results.size} result${if (results.size == 1) "" else "s"} found",
+                style = MaterialTheme.typography.labelSmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+        }
+
+        Spacer(modifier = Modifier.height(8.dp))
+
+        LazyColumn(
+            modifier = Modifier.fillMaxSize(),
+            contentPadding = PaddingValues(bottom = 16.dp),
+            verticalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            items(results, key = { it.song.id }) { result ->
+                SearchResultItem(
+                    result = result,
+                    onClick = { onOpenSong(result.song.id) }
+                )
             }
         }
+
     }
 }
 
+
 @Composable
-private fun ResultRow(
-    song: Song,
-    onClick: () -> Unit
-) {
+fun SearchResultItem(result: SearchResult, onClick: () -> Unit) {
+    val song = result.song
+    val matched = result.matchedLine
+
     Column(
         modifier = Modifier
             .fillMaxWidth()
             .clickable(onClick = onClick)
-            .padding(horizontal = 16.dp, vertical = 10.dp)
+            .padding(vertical = 6.dp)
     ) {
+        Text(song.title, style = MaterialTheme.typography.titleMedium)
         Text(
-            text = song.title,
-            style = MaterialTheme.typography.titleMedium,
-            maxLines = 1,
-            overflow = TextOverflow.Ellipsis
+            song.artistName,
+            style = MaterialTheme.typography.bodySmall,
+            color = MaterialTheme.colorScheme.onSurfaceVariant
         )
-//        Text(
-//            text = song.artist,
-//            style = MaterialTheme.typography.bodySmall,
-//            color = MaterialTheme.colorScheme.onSurfaceVariant,
-//            maxLines = 1,
-//            overflow = TextOverflow.Ellipsis
-//        )
-        // Tiny metadata row (optional): key/bpm
-        // if you have them on Song, show them here.
+        if (!song.key.isNullOrBlank() || song.bpm != null) {
+            Text(
+                listOfNotNull(
+                    song.key?.let { "Key: $it" },
+                    song.bpm?.let { "BPM: $it" }
+                ).joinToString(" • "),
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+        }
+
+        if (!matched.isNullOrBlank()) {
+            Spacer(Modifier.height(4.dp))
+            Text(
+                text = matched,
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.primary
+            )
+        }
     }
-    Divider()
 }
+

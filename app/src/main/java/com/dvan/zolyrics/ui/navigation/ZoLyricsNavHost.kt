@@ -15,6 +15,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -22,6 +23,7 @@ import com.dvan.zolyrics.ui.screens.SongScreen
 import com.dvan.zolyrics.ui.screens.favorites.FavoritesScreen
 import com.dvan.zolyrics.ui.screens.home.HomeScreen
 import com.dvan.zolyrics.ui.screens.search.SearchScreen
+import com.dvan.zolyrics.ui.screens.search.SearchViewModel
 import com.dvan.zolyrics.ui.screens.sets.CreateSetScreen
 import com.dvan.zolyrics.ui.screens.sets.SetDetailScreen
 import com.dvan.zolyrics.ui.screens.sets.SetListScreen
@@ -120,14 +122,17 @@ fun ZoLyricsNavHost(
                 }
             )
         }
-
         composable(Screen.Search.route) {
+            val searchViewModel: SearchViewModel = viewModel(factory = SearchViewModel.Factory)
             SearchScreen(
                 onBack = { navController.popBackStack() },
                 onOpenSong = { songId ->
                     navController.navigate("song/$songId")
-                }
+                },
+                searchViewModel= searchViewModel
             )
         }
+
+
     }
 }
