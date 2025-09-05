@@ -116,6 +116,16 @@ class SongSetViewModel(
         }
     }
 
+    fun addSongToSet(setId: String, songId: String) = viewModelScope.launch {
+        repository.addSongToSet(setId, songId)
+    }
+
+    suspend fun isSongInSet(setId: String, songId: String): Boolean {
+        return repository.isSongInSet(setId, songId)
+    }
+
+
+
     companion object {
         val Factory: ViewModelProvider.Factory = viewModelFactory {
             initializer {

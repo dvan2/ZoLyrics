@@ -20,8 +20,10 @@ class SearchViewModel(
 ): ViewModel() {
 
     var query by mutableStateOf("")
-    var results by mutableStateOf<List<SearchResult>>(emptyList())
+        private set
 
+    var results by mutableStateOf<List<SearchResult>>(emptyList())
+        private set
 
     private var searchJob: Job? = null
 
@@ -30,8 +32,15 @@ class SearchViewModel(
         searchJob?.cancel()
         searchJob = viewModelScope.launch {
             delay(300)
-            results = if (query.isBlank()) emptyList()
-            else repo.searchSongsWithLyricMatches(query)
+            results = if (query.isBlank()) {
+                emptyList()
+            } else {
+                val ftsQuery = query.trim()
+                    .split("\\s+".toRegex())
+                    .joinToString(" ") { "$it*" }
+
+                repo.searchSongsWithLyricMatches(ftsQuery)
+            }
         }
     }
 

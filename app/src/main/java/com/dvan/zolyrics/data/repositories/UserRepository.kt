@@ -56,4 +56,28 @@ class UserRepository(
     companion object {
         const val LOCAL_USER_ID = "local-default-user"
     }
+
+    suspend fun addSongToSet(setId: String, songId: String) {
+        val existingItems = setItemDao.getItemsForSetBlocking(setId)
+
+        // Avoid adding duplicates
+        if (existingItems.any { it.songId == songId }) return
+
+        val nextPosition = (existingItems.maxOfOrNull { it.position } ?: 0) + 1
+
+        val item = SetItem(
+            setId = setId,
+            songId = songId,
+            position = nextPosition
+        )
+
+        setItemDao.insertSetItem(item)
+    }
+
+    suspend fun isSongInSet(setId: String, songId: String): Boolean {
+        val items = setItemDao.getItemsForSetBlocking(setId)
+        return items.any { it.songId == songId }
+    }
+
+
 }
