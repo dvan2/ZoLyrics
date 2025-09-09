@@ -12,4 +12,9 @@
 /captures
 .externalNativeBuild
 .cxx
+*.apk
+*.ap_
+*.dm
+*.aab
+output-metadata.json
 local.properties
