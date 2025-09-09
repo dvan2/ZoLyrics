@@ -9,9 +9,6 @@ class SupabaseService {
     private val supabase = SupabaseClientProvider.client
 
     suspend fun getAllSongs(): List<Song> {
-//        return supabase.from("songs")
-//            .select()
-//            .decodeList()
         val rows: List<RemoteSongRow> = supabase
             .from("song_with_first_artist")   // ← your Supabase view
             .select()

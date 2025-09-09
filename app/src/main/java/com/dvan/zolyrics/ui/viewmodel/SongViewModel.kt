@@ -28,8 +28,6 @@ class SongViewModel (private val repository: SongRepository): ViewModel(){
     private val _lyricsState = MutableStateFlow<LyricsUiState>(LyricsUiState.Loading)
     val lyricsState: StateFlow<LyricsUiState> = _lyricsState
 
-    private val _selectedLyrics = MutableStateFlow<List<LyricLine>>(emptyList())
-
     val favorites: Flow<List<FavoriteSong>> = repository.getFavorites()
 
     private var lastLoadedSongId: String? = null

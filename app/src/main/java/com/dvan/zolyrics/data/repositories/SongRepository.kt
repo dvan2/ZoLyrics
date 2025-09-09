@@ -1,5 +1,6 @@
 package com.dvan.zolyrics.data.repositories
 
+import android.util.Log
 import com.dvan.zolyrics.data.local.FavoriteDao
 import com.dvan.zolyrics.data.local.LyricDao
 import com.dvan.zolyrics.data.local.SongDao
@@ -21,16 +22,26 @@ class SongRepository(
     }
 
     suspend fun refreshSongsFromSupabase() {
-        val songs = supabaseService.getAllSongs()
-        songDao.upsertAll(songs)
+        try {
+            val songs = supabaseService.getAllSongs()
+            if (songs.isNotEmpty()) {
+                songDao.upsertAll(songs)
+            }
+        } catch (t: Throwable) {
+            Log.w("SongRepository", "Refresh failed, using local cache: ${t.message}")
+        }
     }
 
 
     fun getLyrics(songId: String): Flow<List<LyricLine>> = lyricDao.getLyrics(songId)
 
     suspend fun loadLyricsFromSupabase(songId: String) {
-        val remoteLyrics = supabaseService.getLyrics(songId)
-        lyricDao.insertAll(remoteLyrics)
+        try{
+            val remoteLyrics = supabaseService.getLyrics(songId)
+            lyricDao.insertAll(remoteLyrics)
+        } catch (t: Throwable) {
+            Log.w("SongRepository", "Lyrics fetch failed")
+        }
     }
 
     fun getFavorites(): Flow<List<FavoriteSong>> = favoriteDao.getAllFavorites()
