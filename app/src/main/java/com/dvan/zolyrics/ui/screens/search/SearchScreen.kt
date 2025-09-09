@@ -131,7 +131,7 @@ fun SearchScreen(
                         selectedSongId?.let { songId ->
                             coroutineScope.launch {
                                 songSetViewModel.addSongToSet(set.id, songId)
-                                sheetState.hide() // ✅ Wait for animation to complete
+                                sheetState.hide()
                                 selectedSongId = null
                                 snackbarHostState.showSnackbar("Added to \"${set.title}\"")
                             }
