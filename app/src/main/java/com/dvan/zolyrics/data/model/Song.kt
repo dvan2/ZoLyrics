@@ -5,11 +5,12 @@ import androidx.room.PrimaryKey
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
-@Entity(tableName = "lyric_lines")
+@Entity(
+    tableName = "lyric_lines",
+    primaryKeys = ["songId", "lineNumber"]
+)
 @Serializable
 data class LyricLine(
-    @PrimaryKey
-    val id: String,
     @SerialName("song_id")
     val songId: String,
     @SerialName("section_type")

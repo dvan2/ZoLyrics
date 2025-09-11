@@ -17,7 +17,7 @@ interface LyricDao {
     @Query("SELECT * FROM lyric_lines WHERE songId = :songId ORDER BY lineNumber")
     suspend fun getLyricsSync(songId: String): List<LyricLine>
 
-    @Insert(onConflict = OnConflictStrategy.IGNORE)
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertAll(lyrics: List<LyricLine>)
 
     @Query("DELETE FROM lyric_lines")
@@ -46,5 +46,6 @@ interface LyricDao {
 """)
     suspend fun searchLyricMatches(query: String): List<MatchedLyric>
 
-
+    @Query("SELECT COUNT(*) FROM lyric_lines")
+    suspend fun count(): Int
 }

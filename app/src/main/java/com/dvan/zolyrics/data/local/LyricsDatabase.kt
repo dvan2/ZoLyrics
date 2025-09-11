@@ -16,7 +16,7 @@ import com.dvan.zolyrics.data.model.UserSongKeyPref
 
 @Database(entities = [Song::class, FavoriteSong::class, LyricLine::class, SongSet::class, SetItem::class,
     SetSongKeyOverride::class, UserSongKeyPref::class, LyricLineFts::class],
-    version = 8, exportSchema = false)
+    version = 9, exportSchema = false)
 abstract class LyricsDatabase : RoomDatabase() {
 
     abstract fun songDao(): SongDao

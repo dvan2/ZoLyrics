@@ -35,6 +35,7 @@ class SongViewModel (private val repository: SongRepository): ViewModel(){
     init {
         viewModelScope.launch {
             repository.refreshSongsFromSupabase()
+            repository.preloadLyricsIfNeeded()
         }
     }
 
@@ -68,11 +69,9 @@ class SongViewModel (private val repository: SongRepository): ViewModel(){
     fun toggleFavorite(songId: String) {
         viewModelScope.launch {
             val isFav = repository.isFavorite(songId).first()
-            val allFavs = repository.getFavorites().first()
-            println("Favorites after delete attempt: ${allFavs.map { it.songId }}")
+            repository.getFavorites().first()
                 if (isFav) {
                     repository.removeFavorite(songId)
-                    println("Removed from favorites")
                 } else {
                     repository.addFavorite(songId)
                 }

@@ -9,7 +9,9 @@ import com.dvan.zolyrics.data.model.LyricLine
 import com.dvan.zolyrics.data.model.Song
 import com.dvan.zolyrics.data.remote.SupabaseService
 import com.dvan.zolyrics.ui.screens.search.SearchResult
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.first
 
 class SongRepository(
     private val supabaseService: SupabaseService,
@@ -36,7 +38,7 @@ class SongRepository(
     fun getLyrics(songId: String): Flow<List<LyricLine>> = lyricDao.getLyrics(songId)
 
     suspend fun loadLyricsFromSupabase(songId: String) {
-        try{
+        try {
             val remoteLyrics = supabaseService.getLyrics(songId)
             lyricDao.insertAll(remoteLyrics)
         } catch (t: Throwable) {
@@ -73,6 +75,31 @@ class SongRepository(
         return (titleResults + lyricGrouped).distinctBy { it.song.id }
     }
 
+    suspend fun preloadLyricsIfNeeded() {
+        try {
+            val songs = songDao.getAllSongs().first()
+            val lyricCount = lyricDao.count()
 
+            if (lyricCount < songs.size * 3) { // Estimate: avg 3+ lines per song
+                // Load in batches of 10 with 1 second delay between
+                val batches = songs.chunked(10)
+                for ((i, batch) in batches.withIndex()) {
+                    batch.forEach { song ->
+                        val localLyrics = lyricDao.getLyricsSync(song.id)
+                        if (localLyrics.isEmpty()) {
+                            loadLyricsFromSupabase(song.id)
+                        }
+                    }
+                    Log.d("PreloadLyrics", "Batch ${i + 1} of ${batches.size} completed")
+                    delay(1000) // Wait 1 second between batches to avoid Supabase rate limits
+                }
 
+                Log.d("PreloadLyrics", "Finished preloading lyrics.")
+            } else {
+                Log.d("PreloadLyrics", "Lyrics already cached. Skipping preload.")
+            }
+        } catch (e: Exception) {
+            Log.e("SongRepository", "Preloading lyrics failed: ${e.message}")
+        }
+    }
 }
