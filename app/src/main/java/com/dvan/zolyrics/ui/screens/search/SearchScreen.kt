@@ -37,7 +37,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.dvan.zolyrics.ui.viewmodel.SongSetViewModel
 import kotlinx.coroutines.launch
 
@@ -46,8 +46,8 @@ import kotlinx.coroutines.launch
 fun SearchScreen(
     onBack: () -> Unit,
     onOpenSong: (String) -> Unit,
-    searchViewModel: SearchViewModel = viewModel(factory = SearchViewModel.Factory),
-    songSetViewModel: SongSetViewModel = viewModel(factory = SongSetViewModel.Factory)
+    searchViewModel: SearchViewModel = hiltViewModel(),
+    songSetViewModel: SongSetViewModel = hiltViewModel()
 ) {
     val query = searchViewModel.query
     val results = searchViewModel.results

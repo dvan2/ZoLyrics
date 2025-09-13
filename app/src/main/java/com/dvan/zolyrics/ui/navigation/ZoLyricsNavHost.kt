@@ -15,11 +15,11 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
-import com.dvan.zolyrics.ui.screens.SongScreen
+import com.dvan.zolyrics.ui.screens.components.SongScreen
 import com.dvan.zolyrics.ui.screens.favorites.FavoritesScreen
 import com.dvan.zolyrics.ui.screens.home.HomeScreen
 import com.dvan.zolyrics.ui.screens.search.SearchScreen
@@ -34,10 +34,10 @@ import com.dvan.zolyrics.ui.viewmodel.SongViewModel
 fun ZoLyricsNavHost(
     navController: NavHostController,
     innerPadding: PaddingValues,
-    viewModel: SongViewModel,
     setFabIcon: (ImageVector?) -> Unit,
     setFabClick: ((() -> Unit)?) -> Unit
 ) {
+    val viewModel: SongViewModel = hiltViewModel()
     NavHost(
         navController = navController,
         startDestination = Screen.Home.route,
@@ -123,7 +123,7 @@ fun ZoLyricsNavHost(
             )
         }
         composable(Screen.Search.route) {
-            val searchViewModel: SearchViewModel = viewModel(factory = SearchViewModel.Factory)
+            val searchViewModel: SearchViewModel = hiltViewModel()
             SearchScreen(
                 onBack = { navController.popBackStack() },
                 onOpenSong = { songId ->

@@ -51,12 +51,6 @@ class SongRepository(
     suspend fun addFavorite(songId: String) = favoriteDao.insert(FavoriteSong(songId))
     suspend fun removeFavorite(songId: String) = favoriteDao.delete(songId)
 
-    suspend fun searchSongs(query: String): List<Song> {
-        val titleArtistHits = lyricDao.searchByTitleOrArtist(query)
-        val lyricHits = lyricDao.searchSongsByLyrics(query)
-        return (titleArtistHits + lyricHits).distinctBy { it.id }
-    }
-
     suspend fun searchSongsWithLyricMatches(query: String): List<SearchResult> {
         val titleHits = lyricDao.searchByTitleOrArtist(query)
         val lyricHits = lyricDao.searchLyricMatches(query)

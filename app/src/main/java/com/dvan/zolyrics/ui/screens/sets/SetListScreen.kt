@@ -30,15 +30,15 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.dvan.zolyrics.ui.navigation.Screen
 import com.dvan.zolyrics.ui.viewmodel.SongSetViewModel
 
 @Composable
 fun SetListScreen(
-    viewModel: SongSetViewModel = viewModel(factory = SongSetViewModel.Factory),
+    viewModel: SongSetViewModel = hiltViewModel(),
     navController: NavController
 ) {
     val allSets by viewModel.allSets.collectAsStateWithLifecycle(initialValue = emptyList())

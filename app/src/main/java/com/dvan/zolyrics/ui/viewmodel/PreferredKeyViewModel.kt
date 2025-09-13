@@ -1,17 +1,16 @@
 package com.dvan.zolyrics.ui.viewmodel
 
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
-import androidx.lifecycle.viewmodel.initializer
-import androidx.lifecycle.viewmodel.viewModelFactory
-import com.dvan.zolyrics.LyricsApplication
 import com.dvan.zolyrics.data.repositories.UserKeyPrefRepository
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-class PreferredKeyViewModel(
+@HiltViewModel
+class PreferredKeyViewModel @Inject constructor(
     private val repo: UserKeyPrefRepository
 ): ViewModel() {
     private val _map = MutableStateFlow<Map<String,String>>(emptyMap())
@@ -32,14 +31,4 @@ class PreferredKeyViewModel(
     fun clearGlobalPreferredKey(songId: String) = viewModelScope.launch {
         repo.clearGlobalPreferredKey(songId)
     }
-
-    companion object {
-        val Factory: ViewModelProvider.Factory = viewModelFactory {
-            initializer {
-                val app = (this[ViewModelProvider.AndroidViewModelFactory.APPLICATION_KEY] as LyricsApplication)
-                PreferredKeyViewModel(app.container.preferredKeyRepository)
-            }
-        }
-    }
-
 }

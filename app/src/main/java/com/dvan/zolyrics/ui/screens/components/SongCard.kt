@@ -30,7 +30,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.dvan.zolyrics.data.model.Song
 import com.dvan.zolyrics.ui.viewmodel.PreferredKeyViewModel
 
@@ -40,7 +40,7 @@ fun SongCard(
     song: Song,
     onClick: () -> Unit
 ) {
-    val keyVm: PreferredKeyViewModel = viewModel(factory = PreferredKeyViewModel.Factory)
+    val keyVm: PreferredKeyViewModel = hiltViewModel()
     val prefMap by keyVm.map.collectAsState()
     val originalKey = song.key.orEmpty()
     val effectiveKey = prefMap[song.id]?.takeIf { it.isNotBlank() } ?: originalKey

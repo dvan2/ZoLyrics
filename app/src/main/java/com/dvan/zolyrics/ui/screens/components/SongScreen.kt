@@ -1,4 +1,4 @@
-package com.dvan.zolyrics.ui.screens
+package com.dvan.zolyrics.ui.screens.components
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -29,11 +29,9 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.dvan.zolyrics.data.model.LyricLine
 import com.dvan.zolyrics.data.model.Song
-import com.dvan.zolyrics.ui.screens.components.LyricsSectionDisplay
-import com.dvan.zolyrics.ui.screens.components.SongHeaderWithPref
 import com.dvan.zolyrics.ui.viewmodel.PreferredKeyViewModel
 import kotlinx.coroutines.launch
 import kotlin.math.abs
@@ -46,7 +44,7 @@ fun SongScreen(
     val SectionsStartIndex = 2
 
 
-    val prefsVm: PreferredKeyViewModel = viewModel(factory = PreferredKeyViewModel.Factory)
+    val prefsVm: PreferredKeyViewModel = hiltViewModel()
     val prefMap by prefsVm.map.collectAsState()
     val globalPrefFortThisSong = prefMap[song.id]
 

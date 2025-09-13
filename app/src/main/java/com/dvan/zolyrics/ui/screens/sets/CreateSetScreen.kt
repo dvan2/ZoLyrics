@@ -25,7 +25,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.dvan.zolyrics.data.model.Song
 import com.dvan.zolyrics.ui.viewmodel.SongSetViewModel
 import com.dvan.zolyrics.ui.viewmodel.SongViewModel
@@ -34,8 +34,8 @@ import kotlinx.coroutines.flow.StateFlow
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CreateSetScreen(
-    viewModel: SongSetViewModel = viewModel(factory = SongSetViewModel.Factory),
-    songViewModel: SongViewModel = viewModel(factory = SongViewModel.Factory),
+    viewModel: SongSetViewModel = hiltViewModel(),
+    songViewModel: SongViewModel = hiltViewModel(),
     onSetCreated: () -> Unit,
     fabSaveRequests: StateFlow<Long>,
 ) {

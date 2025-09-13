@@ -15,7 +15,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalHapticFeedback
-import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.dvan.zolyrics.ui.keys.KeyPickerSheet
 import com.dvan.zolyrics.ui.model.SongInSetContract
 import com.dvan.zolyrics.ui.viewmodel.SongSetViewModel
@@ -26,7 +26,7 @@ private val MUSICAL_KEYS_SHARPS = listOf("C","C#","D","D#","E","F","F#","G","G#"
 @Composable
 fun SetDetailScreen(
     setId: String,
-    viewModel: SongSetViewModel = viewModel(factory = SongSetViewModel.Factory),
+    viewModel: SongSetViewModel = hiltViewModel(),
     onSongClick: (String) -> Unit
 ) {
     // Load songs for the set when setId changes

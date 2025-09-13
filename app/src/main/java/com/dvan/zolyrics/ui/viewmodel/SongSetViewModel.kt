@@ -1,24 +1,23 @@
 package com.dvan.zolyrics.ui.viewmodel
 
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
-import androidx.lifecycle.viewmodel.initializer
-import androidx.lifecycle.viewmodel.viewModelFactory
-import com.dvan.zolyrics.LyricsApplication
 import com.dvan.zolyrics.data.model.SetItem
 import com.dvan.zolyrics.data.model.Song
 import com.dvan.zolyrics.data.model.SongSet
 import com.dvan.zolyrics.data.repositories.KeyOverrideRepository
 import com.dvan.zolyrics.data.repositories.UserRepository
 import com.dvan.zolyrics.ui.model.SongInSetContract
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-class SongSetViewModel(
+@HiltViewModel
+class SongSetViewModel @Inject constructor(
     private val repository: UserRepository,
     private val keyOverrideRepository: KeyOverrideRepository
 ) : ViewModel() {
@@ -122,19 +121,6 @@ class SongSetViewModel(
 
     suspend fun isSongInSet(setId: String, songId: String): Boolean {
         return repository.isSongInSet(setId, songId)
-    }
-
-
-
-    companion object {
-        val Factory: ViewModelProvider.Factory = viewModelFactory {
-            initializer {
-                val application = (this[ViewModelProvider.AndroidViewModelFactory.APPLICATION_KEY] as LyricsApplication)
-                val userRepo = application.container.userRepository
-                val overrideRepo = application.container.overrideRepository
-                SongSetViewModel(userRepo,overrideRepo)
-            }
-        }
     }
 }
 

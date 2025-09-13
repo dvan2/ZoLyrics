@@ -1,20 +1,18 @@
 package com.dvan.zolyrics.ui.viewmodel
 
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
-import androidx.lifecycle.viewmodel.initializer
-import androidx.lifecycle.viewmodel.viewModelFactory
-import com.dvan.zolyrics.LyricsApplication
 import com.dvan.zolyrics.data.model.FavoriteSong
 import com.dvan.zolyrics.data.model.LyricLine
 import com.dvan.zolyrics.data.model.Song
 import com.dvan.zolyrics.data.repositories.SongRepository
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
 sealed class LyricsUiState {
     object Loading : LyricsUiState()
@@ -22,7 +20,8 @@ sealed class LyricsUiState {
     data class Error(val message: String) : LyricsUiState()
 }
 
-class SongViewModel (private val repository: SongRepository): ViewModel(){
+@HiltViewModel
+class SongViewModel @Inject constructor(private val repository: SongRepository): ViewModel(){
     val localSongs: Flow<List<Song>> = repository.getLocalSongs()
 
     private val _lyricsState = MutableStateFlow<LyricsUiState>(LyricsUiState.Loading)
@@ -77,15 +76,4 @@ class SongViewModel (private val repository: SongRepository): ViewModel(){
                 }
         }
     }
-
-    companion object {
-        val Factory: ViewModelProvider.Factory = viewModelFactory {
-            initializer {
-                val application = (this[ViewModelProvider.AndroidViewModelFactory.APPLICATION_KEY] as LyricsApplication)
-                val songRepository = application.container.songRepository
-                SongViewModel(songRepository)
-            }
-        }
-    }
-
 }

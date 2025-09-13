@@ -16,7 +16,7 @@ import com.dvan.zolyrics.data.model.UserSongKeyPref
 
 @Database(entities = [Song::class, FavoriteSong::class, LyricLine::class, SongSet::class, SetItem::class,
     SetSongKeyOverride::class, UserSongKeyPref::class, LyricLineFts::class],
-    version = 9, exportSchema = false)
+    version = 10, exportSchema = false)
 abstract class LyricsDatabase : RoomDatabase() {
 
     abstract fun songDao(): SongDao
@@ -38,7 +38,7 @@ abstract class LyricsDatabase : RoomDatabase() {
                     LyricsDatabase::class.java,
                     "lyrics_database"
                 )
-                    .addCallback(object: RoomDatabase.Callback() {
+                    .addCallback(object: Callback() {
                         override fun onOpen(db: SupportSQLiteDatabase) {
                             super.onOpen(db)
                             db.execSQL("PRAGMA foreign_keys=ON;")

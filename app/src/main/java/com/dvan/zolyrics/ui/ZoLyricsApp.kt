@@ -17,7 +17,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
@@ -33,7 +33,7 @@ fun ZoLyricsApp() {
     val navController = rememberNavController()
     val currentBackStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = currentBackStackEntry?.destination?.route
-    val viewModel: SongViewModel = viewModel(factory = SongViewModel.Factory)
+    val viewModel: SongViewModel = hiltViewModel()
 
     var onFabClick: (() -> Unit)? by remember { mutableStateOf(null) }
     var fabIcon: ImageVector? by remember { mutableStateOf(null) }
@@ -57,7 +57,7 @@ fun ZoLyricsApp() {
             )
         }
     ){ innerPadding ->
-        ZoLyricsNavHost(navController, innerPadding, viewModel, setFabIcon = { fabIcon = it} , setFabClick = { onFabClick = it})
+        ZoLyricsNavHost(navController, innerPadding, setFabIcon = { fabIcon = it} , setFabClick = { onFabClick = it})
     }
 }
 

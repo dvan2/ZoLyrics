@@ -24,7 +24,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.dvan.zolyrics.data.model.Song
 import com.dvan.zolyrics.ui.navigation.Screen
@@ -36,7 +36,7 @@ import com.dvan.zolyrics.ui.viewmodel.SongViewModel
 fun HomeScreen(
     navController: NavController
 ) {
-    val viewModel: SongViewModel = viewModel(factory = SongViewModel.Factory)
+    val viewModel: SongViewModel = hiltViewModel()
     val songs by viewModel.localSongs.collectAsState(initial = emptyList())
 
     var query by rememberSaveable { mutableStateOf("") }

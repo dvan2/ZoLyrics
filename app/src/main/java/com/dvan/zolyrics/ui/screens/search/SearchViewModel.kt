@@ -4,18 +4,17 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
-import androidx.lifecycle.viewmodel.initializer
-import androidx.lifecycle.viewmodel.viewModelFactory
-import com.dvan.zolyrics.LyricsApplication
 import com.dvan.zolyrics.data.model.Song
 import com.dvan.zolyrics.data.repositories.SongRepository
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-class SearchViewModel(
+@HiltViewModel
+class SearchViewModel @Inject constructor(
     private val repo: SongRepository
 ): ViewModel() {
 
@@ -40,16 +39,6 @@ class SearchViewModel(
                     .joinToString(" ") { "$it*" }
 
                 repo.searchSongsWithLyricMatches(ftsQuery)
-            }
-        }
-    }
-
-    companion object {
-        val Factory = viewModelFactory {
-            initializer {
-                val app =
-                    this[ViewModelProvider.AndroidViewModelFactory.APPLICATION_KEY] as LyricsApplication
-                SearchViewModel(app.container.songRepository)
             }
         }
     }
