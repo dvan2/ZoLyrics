@@ -11,6 +11,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -20,7 +21,9 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.dvan.zolyrics.R
 import com.dvan.zolyrics.ui.keys.KeyPickerSheet
 import com.dvan.zolyrics.ui.model.SongInSetContract
+import com.dvan.zolyrics.ui.screens.components.LocalSnackbarHostState
 import com.dvan.zolyrics.ui.viewmodel.SongSetViewModel
+import kotlinx.coroutines.launch
 
 private val MUSICAL_KEYS_SHARPS = listOf("C","C#","D","D#","E","F","F#","G","G#","A","A#","B")
 
@@ -39,6 +42,9 @@ fun SetDetailScreen(
     var editing by remember { mutableStateOf<SongInSetContract?>(null) }
 
     val haptics = LocalHapticFeedback.current
+
+    val snackbarHostState = LocalSnackbarHostState.current
+    val coroutineScope = rememberCoroutineScope()
 
     when {
         isLoading -> Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) { CircularProgressIndicator() }
@@ -80,6 +86,9 @@ fun SetDetailScreen(
             onClose = { editing = null },
             onDelete = {
                 viewModel.removeSongFromSet(setId, songId)
+                coroutineScope.launch {
+                    snackbarHostState.showSnackbar("Removed from set")
+                }
                 editing = null
             }
         )

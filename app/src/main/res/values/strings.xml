@@ -21,5 +21,6 @@
     <string name="select_songs">Select Songs</string>
     <string name="no_songs_in_playlist">No songs found in this playlist.</string>
     <string name="add_to_set">Add to playlist\n</string>
+    <string name="remove_from_playlist">Remove from Playlist</string>
 
 </resources>

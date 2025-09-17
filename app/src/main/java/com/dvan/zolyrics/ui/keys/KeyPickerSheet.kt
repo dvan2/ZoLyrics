@@ -16,6 +16,7 @@ import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.AssistChip
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -24,7 +25,9 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import com.dvan.zolyrics.R
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -79,18 +82,16 @@ fun KeyPickerSheet(
 
             Spacer(Modifier.height(12.dp))
 
-            if (onDelete != null) {
-                Button(
-                    onClick = onDelete,
-                    colors = androidx.compose.material3.ButtonDefaults.buttonColors(
-                        containerColor = MaterialTheme.colorScheme.error
-                    ),
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-                    Icon(Icons.Default.Delete, contentDescription = "Delete")
-                    Spacer(Modifier.width(8.dp))
-                    Text("Remove from Playlist")
-                }
+            Button(
+                onClick = onDelete,
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = MaterialTheme.colorScheme.error
+                ),
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Icon(Icons.Default.Delete, contentDescription = "Delete")
+                Spacer(Modifier.width(8.dp))
+                Text(stringResource(R.string.remove_from_playlist))
             }
 
             Spacer(Modifier.height(8.dp))
