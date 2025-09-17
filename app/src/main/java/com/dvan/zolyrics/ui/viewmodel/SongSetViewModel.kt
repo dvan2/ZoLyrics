@@ -122,6 +122,14 @@ class SongSetViewModel @Inject constructor(
     suspend fun isSongInSet(setId: String, songId: String): Boolean {
         return repository.isSongInSet(setId, songId)
     }
+
+    fun removeSongFromSet(setId: String, songId: String) = viewModelScope.launch {
+        repository.removeSongFromSet(setId, songId)
+
+        // update local state so UI refreshes without waiting for re-collect
+        _orderedSongs.value = _orderedSongs.value.filterNot { it.song.id == songId }
+    }
+
 }
 
 data class SongInSetUi(

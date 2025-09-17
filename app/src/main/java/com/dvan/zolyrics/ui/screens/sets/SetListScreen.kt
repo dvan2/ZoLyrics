@@ -28,11 +28,13 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
+import com.dvan.zolyrics.R
 import com.dvan.zolyrics.ui.navigation.Screen
 import com.dvan.zolyrics.ui.viewmodel.SongSetViewModel
 
@@ -65,7 +67,7 @@ fun SetListScreen(
             value = query,
             onValueChange = { query = it },
             leadingIcon = { Icon(Icons.Default.Search, null) },
-            placeholder = { Text("Search sets") },
+            placeholder = { Text(stringResource(R.string.search_playlists)) },
             singleLine = true,
             modifier = Modifier
                 .fillMaxWidth()
@@ -114,20 +116,20 @@ fun SetListScreen(
         if (pendingDeleteId != null) {
             androidx.compose.material3.AlertDialog(
                 onDismissRequest = { pendingDeleteId = null },
-                title = { Text("Delete set?") },
-                text = { Text("This removes the set and its items. Songs themselves are not deleted.") },
+                title = { Text(stringResource(R.string.delete_playlist_title)) },
+                text = { Text(stringResource(R.string.delete_playlist_message)) },
                 confirmButton = {
                     androidx.compose.material3.TextButton(
                         onClick = {
-                            viewModel.deleteSet(pendingDeleteId!!) // implement below
+                            viewModel.deleteSet(pendingDeleteId!!)
                             pendingDeleteId = null
                         }
-                    ) { Text("Delete") }
+                    ) { Text(stringResource(R.string.delete)) }
                 },
                 dismissButton = {
                     androidx.compose.material3.TextButton(
                         onClick = { pendingDeleteId = null }
-                    ) { Text("Cancel") }
+                    ) { Text(stringResource(R.string.cancel)) }
                 }
             )
         }
@@ -170,20 +172,20 @@ private fun EmptyState(
             modifier = Modifier.size(56.dp)
         )
         Spacer(Modifier.height(12.dp))
-        Text("No sets yet", style = MaterialTheme.typography.titleLarge)
+        Text(stringResource(R.string.no_playlists_yet), style = MaterialTheme.typography.titleLarge)
         Spacer(Modifier.height(4.dp))
         Text(
-            "Create your first set to get started.",
+            stringResource(R.string.create_first_playlist),
             style = MaterialTheme.typography.bodyMedium
         )
         Spacer(Modifier.height(16.dp))
-        OutlinedButton(onClick = onCreateClick) { Text("Create set") }
+        OutlinedButton(onClick = onCreateClick) { Text(stringResource(R.string.create_playlist)) }
         Spacer(Modifier.height(24.dp))
 
         OutlinedTextField(
             value = query,
             onValueChange = onQueryChange,
-            placeholder = { Text("Search sets") },
+            placeholder = { Text(stringResource(R.string.search_playlists)) },
             singleLine = true
         )
     }

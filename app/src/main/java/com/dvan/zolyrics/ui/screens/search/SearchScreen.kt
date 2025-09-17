@@ -36,8 +36,10 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.dvan.zolyrics.R
 import com.dvan.zolyrics.ui.viewmodel.SongSetViewModel
 import kotlinx.coroutines.launch
 
@@ -114,7 +116,7 @@ fun SearchScreen(
             onDismissRequest = { selectedSongId = null },
             sheetState = sheetState
         ) {
-            Text("Add to Set", style = MaterialTheme.typography.titleMedium, modifier = Modifier.padding(16.dp))
+            Text(stringResource(R.string.add_to_set), style = MaterialTheme.typography.titleMedium, modifier = Modifier.padding(16.dp))
 
             sets.forEach { set ->
                 var songAlreadyInSet by remember { mutableStateOf(false) }

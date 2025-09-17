@@ -13,7 +13,9 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.res.stringResource
 import androidx.navigation.NavHostController
+import com.dvan.zolyrics.R
 import com.dvan.zolyrics.ui.navigation.Screen
 import com.dvan.zolyrics.ui.viewmodel.SongViewModel
 
@@ -28,14 +30,14 @@ fun ZoLyricsTopBar(
         title = {
             Text(
                 when {
-                    currentRoute == Screen.Home.route -> "ZoLyrics"
-                    currentRoute == Screen.Favorites.route -> "Favorites"
-                    currentRoute == Screen.Sets.route -> "Sets"
-                    currentRoute == "sets/create" -> "Create Set"
-                    currentRoute?.startsWith("sets/") == true -> "Set Details"
-                    currentRoute?.startsWith("song/") == true -> "Song"
-                    currentRoute == Screen.Search.route -> "Search"
-                    else -> "ZoLyrics"
+                    currentRoute == Screen.Home.route -> stringResource(R.string.app_name)
+                    currentRoute == Screen.Favorites.route -> stringResource(R.string.label_favorites)
+                    currentRoute == Screen.Sets.route -> stringResource(R.string.label_sets)
+                    currentRoute == "sets/create" -> stringResource(R.string.label_create_set)
+                    currentRoute?.startsWith("sets/") == true -> stringResource(R.string.label_set_details)
+                    currentRoute?.startsWith("song/") == true -> stringResource(R.string.label_song)
+                    currentRoute == Screen.Search.route -> stringResource(R.string.label_search)
+                    else -> stringResource(R.string.app_name)
                 }
             )
         },
@@ -52,7 +54,6 @@ fun ZoLyricsTopBar(
 
         actions = {
             when {
-                // On a Song detail screen → show Favorite toggle
                 currentRoute?.startsWith("song/") == true -> {
                     val currentSongId = navController.currentBackStackEntry?.arguments?.getString("songId")
                     if (currentSongId != null) {

@@ -10,13 +10,17 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.stringResource
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import androidx.navigation.NavHostController
@@ -24,6 +28,7 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.dvan.zolyrics.ui.navigation.Screen
 import com.dvan.zolyrics.ui.navigation.ZoLyricsNavHost
+import com.dvan.zolyrics.ui.screens.components.LocalSnackbarHostState
 import com.dvan.zolyrics.ui.screens.components.ZoLyricsTopBar
 import com.dvan.zolyrics.ui.viewmodel.SongViewModel
 
@@ -38,40 +43,45 @@ fun ZoLyricsApp() {
     var onFabClick: (() -> Unit)? by remember { mutableStateOf(null) }
     var fabIcon: ImageVector? by remember { mutableStateOf(null) }
 
-    Scaffold (
-        containerColor = MaterialTheme.colorScheme.background,
-        contentColor = MaterialTheme.colorScheme.onBackground,
-        topBar = {
-            ZoLyricsTopBar(currentRoute, navController, viewModel)
-        },
-        bottomBar = {
-            BottomNavigationBar(
-                selectedTab = currentRoute ?: Screen.Home.route,
-                navController = navController,
-            )
-        },
-        floatingActionButton = {
-            FabForRoute(
-                currentRoute = currentRoute,
-                navController = navController
-            )
+    val snackbarHostState = remember { SnackbarHostState() }
+
+
+    CompositionLocalProvider(LocalSnackbarHostState provides snackbarHostState) {
+        Scaffold (
+            containerColor = MaterialTheme.colorScheme.background,
+            contentColor = MaterialTheme.colorScheme.onBackground,
+            topBar = {
+                ZoLyricsTopBar(currentRoute, navController, viewModel)
+            },
+            bottomBar = {
+                BottomNavigationBar(
+                    selectedTab = currentRoute ?: Screen.Home.route,
+                    navController = navController,
+                )
+            },
+            floatingActionButton = {
+                FabForRoute(
+                    currentRoute = currentRoute,
+                    navController = navController
+                )
+            },
+            snackbarHost = { SnackbarHost(snackbarHostState) }
+        ){ innerPadding ->
+            ZoLyricsNavHost(navController, innerPadding, setFabIcon = { fabIcon = it} , setFabClick = { onFabClick = it})
         }
-    ){ innerPadding ->
-        ZoLyricsNavHost(navController, innerPadding, setFabIcon = { fabIcon = it} , setFabClick = { onFabClick = it})
     }
+
 }
 
 @Composable
 fun FabForRoute(currentRoute: String?, navController: NavHostController) {
     when (currentRoute) {
-        // Show an “add” FAB on the sets list
         Screen.Sets.route -> {
             FloatingActionButton(onClick = { navController.navigate("sets/create") }) {
                 Icon(Icons.Filled.Add, contentDescription = "Add Set")
             }
         }
 
-        // On create screen, trigger a save event via SavedStateHandle
         "sets/create" -> {
             FloatingActionButton(onClick = {
                 navController.currentBackStackEntry
@@ -83,7 +93,6 @@ fun FabForRoute(currentRoute: String?, navController: NavHostController) {
             }
         }
 
-        // Default: no FAB
         else -> Unit
     }
 }
@@ -91,7 +100,6 @@ fun FabForRoute(currentRoute: String?, navController: NavHostController) {
 @Composable
 fun BottomNavigationBar(
     selectedTab: String,
-//    onTabSelected: (String) -> Unit,
     navController: NavController
 ) {
     val bottomBarScreens = listOf(Screen.Home, Screen.Favorites, Screen.Sets)
@@ -100,8 +108,8 @@ fun BottomNavigationBar(
     NavigationBar {
         bottomBarScreens.forEach { screen ->
             NavigationBarItem(
-                icon = { Icon(screen.icon, contentDescription = screen.label) },
-                label = { Text(screen.label) },
+                icon = { Icon(screen.icon, contentDescription = stringResource(id= screen.labelRes) ) },
+                label = {  Text(stringResource((screen.labelRes)))},
                 selected = selectedTab == screen.route,
                 onClick = {
                     navController.navigate(screen.route) {

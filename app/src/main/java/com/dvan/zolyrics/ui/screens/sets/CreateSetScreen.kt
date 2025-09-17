@@ -24,8 +24,10 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.dvan.zolyrics.R
 import com.dvan.zolyrics.data.model.Song
 import com.dvan.zolyrics.ui.viewmodel.SongSetViewModel
 import com.dvan.zolyrics.ui.viewmodel.SongViewModel
@@ -42,6 +44,7 @@ fun CreateSetScreen(
     val allSongs by songViewModel.localSongs.collectAsState(initial = emptyList())
     var selectedSongs by remember { mutableStateOf<List<Song>>(emptyList()) }
     var setTitle      by remember { mutableStateOf("") }
+    var searchQuery by remember { mutableStateOf("")}
 
     val trigger = fabSaveRequests.collectAsState().value
     LaunchedEffect(trigger) {
@@ -60,11 +63,29 @@ fun CreateSetScreen(
             modifier    = Modifier.fillMaxWidth()
         )
 
+        // 🔎 Search bar
+        OutlinedTextField(
+            value = searchQuery,
+            onValueChange = { searchQuery = it },
+            label = { Text("Search songs") },
+            modifier = Modifier.fillMaxWidth()
+        )
+
         Spacer(modifier = Modifier.height(16.dp))
-        Text("Select Songs", style = MaterialTheme.typography.titleMedium)
+        Text(stringResource(R.string.select_songs), style = MaterialTheme.typography.titleMedium)
+
+        // Filter songs
+        val filteredSongs = if (searchQuery.isBlank()) {
+            allSongs
+        } else {
+            allSongs.filter { song ->
+                song.title.contains(searchQuery, ignoreCase = true) ||
+                        song.artistName.contains(searchQuery, ignoreCase = true)
+            }
+        }
 
         LazyColumn {
-            items(allSongs) { song ->
+            items(filteredSongs) { song ->
                 val isSelected = song in selectedSongs
                 ListItem(
                     headlineContent  = { Text(song.title) },
@@ -74,7 +95,7 @@ fun CreateSetScreen(
                         .clickable {
                             selectedSongs =
                                 if (isSelected) selectedSongs - song
-                                else             selectedSongs + song
+                                else selectedSongs + song
                         }
                         .padding(vertical = 4.dp),
                     trailingContent  = {

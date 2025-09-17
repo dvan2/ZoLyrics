@@ -1,7 +1,6 @@
 package com.dvan.zolyrics.data.local
 
 import androidx.room.Dao
-import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
@@ -25,7 +24,6 @@ interface SetItemDao {
 """)
     suspend fun updatePosition(setId: String, songId: String, position: Int)
 
-
-    @Delete
-    suspend fun deleteSetItem(item: SetItem)
+    @Query("DELETE FROM set_items WHERE setId = :setId AND songId = :songId")
+    suspend fun deleteSongFromSet(setId: String, songId: String)
 }

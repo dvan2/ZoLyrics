@@ -1,5 +1,6 @@
 package com.dvan.zolyrics.ui.screens.components
 
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -38,7 +39,8 @@ import com.dvan.zolyrics.ui.viewmodel.PreferredKeyViewModel
 @Composable
 fun SongCard(
     song: Song,
-    onClick: () -> Unit
+    onClick: () -> Unit,
+    onLongClick: (() -> Unit)? = null
 ) {
     val keyVm: PreferredKeyViewModel = hiltViewModel()
     val prefMap by keyVm.map.collectAsState()
@@ -48,10 +50,13 @@ fun SongCard(
     val colors = MaterialTheme.colorScheme
 
     Card(
-        onClick = onClick,
         modifier = Modifier
             .fillMaxWidth()
-            .padding(horizontal = 16.dp, vertical = 8.dp),
+            .padding(horizontal = 16.dp, vertical = 8.dp)
+            .combinedClickable(
+                onClick = onClick,
+                onLongClick = onLongClick
+            ),
         shape = MaterialTheme.shapes.large,
         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
         colors = CardDefaults.cardColors(containerColor = colors.surface)

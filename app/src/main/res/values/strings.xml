@@ -1,3 +1,25 @@
 <resources>
-    <string name="app_name">ZoLyrics</string>
+    <string name="app_name">Worship Lamal</string>
+    <string name="label_home">Home</string>
+    <string name="label_favorites">Favorites</string>
+    <string name="label_sets">Playlists</string>
+    <string name="label_search">Search</string>
+    <string name="label_song">Song</string>
+    <string name="label_create_set">Create Playlist</string>
+    <string name="label_set_details">Playlist Details</string>
+
+<!--    For playlists-->
+    <string name="delete_playlist_title">Delete playlist?</string>
+    <string name="delete_playlist_message">This removes the playlist and its items. Songs themselves are not deleted.</string>
+    <string name="delete">Delete</string>
+    <string name="cancel">Cancel</string>
+    <string name="no_playlists_yet">No playlists yet</string>
+    <string name="create_first_playlist">Create your first playlist to get started.</string>
+    <string name="create_playlist">Create playlist</string>
+    <string name="search_playlists">Search playlists</string>
+    <string name="playlist_title_label">Playlist Title</string>
+    <string name="select_songs">Select Songs</string>
+    <string name="no_songs_in_playlist">No songs found in this playlist.</string>
+    <string name="add_to_set">Add to playlist\n</string>
+
 </resources>

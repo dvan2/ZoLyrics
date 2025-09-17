@@ -15,7 +15,9 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalHapticFeedback
+import androidx.compose.ui.res.stringResource
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.dvan.zolyrics.R
 import com.dvan.zolyrics.ui.keys.KeyPickerSheet
 import com.dvan.zolyrics.ui.model.SongInSetContract
 import com.dvan.zolyrics.ui.viewmodel.SongSetViewModel
@@ -29,22 +31,21 @@ fun SetDetailScreen(
     viewModel: SongSetViewModel = hiltViewModel(),
     onSongClick: (String) -> Unit
 ) {
-    // Load songs for the set when setId changes
     LaunchedEffect(setId) { viewModel.loadSongsForSet(setId) }
 
     val songsUi = viewModel.songsInSetUi.collectAsState().value
     val isLoading = viewModel.isLoading.collectAsState().value
 
-    // Hold the selected item for editing (type-safe)
     var editing by remember { mutableStateOf<SongInSetContract?>(null) }
 
     val haptics = LocalHapticFeedback.current
 
     when {
         isLoading -> Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) { CircularProgressIndicator() }
-        songsUi.isEmpty() -> Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) { Text("No songs found in this set.") }
+        songsUi.isEmpty() -> Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) { Text(
+            stringResource(R.string.no_songs_in_playlist)
+        ) }
         else -> {
-            // If your repository returns a concrete type (e.g., SongInSetUi), make it implement SongInSetContract.
             @Suppress("UNCHECKED_CAST")
             val typed: List<SongInSetContract> = songsUi as List<SongInSetContract>
 
@@ -76,7 +77,11 @@ fun SetDetailScreen(
                 viewModel.clearPreferredKeyForSong(songId)
                 editing = null
             },
-            onClose = { editing = null }
+            onClose = { editing = null },
+            onDelete = {
+                viewModel.removeSongFromSet(setId, songId)
+                editing = null
+            }
         )
     }
 }

@@ -79,5 +79,7 @@ class UserRepository(
         return items.any { it.songId == songId }
     }
 
-
+    suspend fun removeSongFromSet(setId: String, songId: String) {
+        setItemDao.deleteSongFromSet(setId, songId)
+    }
 }
