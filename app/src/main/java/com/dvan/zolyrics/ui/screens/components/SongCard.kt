@@ -66,7 +66,6 @@ fun SongCard(
                 .padding(horizontal = 16.dp, vertical = 12.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            // Leading avatar / placeholder art
             Surface(
                 modifier = Modifier
                     .size(40.dp)

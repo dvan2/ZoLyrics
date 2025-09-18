@@ -26,6 +26,7 @@ import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import com.dvan.zolyrics.ui.navigation.Routes
 import com.dvan.zolyrics.ui.navigation.Screen
 import com.dvan.zolyrics.ui.navigation.ZoLyricsNavHost
 import com.dvan.zolyrics.ui.screens.components.LocalSnackbarHostState
@@ -45,6 +46,7 @@ fun ZoLyricsApp() {
 
     val snackbarHostState = remember { SnackbarHostState() }
 
+    val isRunner = currentRoute?.startsWith(Routes.SET_RUNNER) == true
 
     CompositionLocalProvider(LocalSnackbarHostState provides snackbarHostState) {
         Scaffold (
@@ -54,16 +56,20 @@ fun ZoLyricsApp() {
                 ZoLyricsTopBar(currentRoute, navController, viewModel)
             },
             bottomBar = {
-                BottomNavigationBar(
-                    selectedTab = currentRoute ?: Screen.Home.route,
-                    navController = navController,
-                )
+                if (!isRunner) {
+                    BottomNavigationBar(
+                        selectedTab = currentRoute ?: Screen.Home.route,
+                        navController = navController,
+                    )
+                }
             },
             floatingActionButton = {
-                FabForRoute(
-                    currentRoute = currentRoute,
-                    navController = navController
-                )
+                if (!isRunner) {
+                    FabForRoute(
+                        currentRoute = currentRoute,
+                        navController = navController
+                    )
+                }
             },
             snackbarHost = { SnackbarHost(snackbarHostState) }
         ){ innerPadding ->
@@ -77,17 +83,17 @@ fun ZoLyricsApp() {
 fun FabForRoute(currentRoute: String?, navController: NavHostController) {
     when (currentRoute) {
         Screen.Sets.route -> {
-            FloatingActionButton(onClick = { navController.navigate("sets/create") }) {
+            FloatingActionButton(onClick = { navController.navigate(Routes.SET_CREATE) }) {
                 Icon(Icons.Filled.Add, contentDescription = "Add Set")
             }
         }
 
-        "sets/create" -> {
+        Routes.SET_CREATE -> {
             FloatingActionButton(onClick = {
                 navController.currentBackStackEntry
                     ?.savedStateHandle
                     // bump a timestamp to signal an event
-                    ?.set("fab_save_request", System.currentTimeMillis())
+                    ?.set(Routes.KEY_FAB_SAVE_REQUEST, System.currentTimeMillis())
             }) {
                 Icon(Icons.Filled.Check, contentDescription = "Save Set")
             }
@@ -108,7 +114,10 @@ fun BottomNavigationBar(
     NavigationBar {
         bottomBarScreens.forEach { screen ->
             NavigationBarItem(
-                icon = { Icon(screen.icon, contentDescription = stringResource(id= screen.labelRes) ) },
+                icon = {
+                    screen.icon?.let {
+                        Icon(it, contentDescription = stringResource(id= screen.labelRes) ) }
+                    },
                 label = {  Text(stringResource((screen.labelRes)))},
                 selected = selectedTab == screen.route,
                 onClick = {

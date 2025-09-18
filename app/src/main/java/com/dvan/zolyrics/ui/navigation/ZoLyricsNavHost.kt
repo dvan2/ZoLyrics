@@ -27,6 +27,7 @@ import com.dvan.zolyrics.ui.screens.search.SearchViewModel
 import com.dvan.zolyrics.ui.screens.sets.CreateSetScreen
 import com.dvan.zolyrics.ui.screens.sets.SetDetailScreen
 import com.dvan.zolyrics.ui.screens.sets.SetListScreen
+import com.dvan.zolyrics.ui.screens.sets.SetRunnerScreen
 import com.dvan.zolyrics.ui.viewmodel.LyricsUiState
 import com.dvan.zolyrics.ui.viewmodel.SongViewModel
 
@@ -49,7 +50,7 @@ fun ZoLyricsNavHost(
         composable(Screen.Favorites.route) {
             FavoritesScreen(navController)
         }
-        composable("song/{songId}") { backStackEntry ->
+        composable(Routes.SONG_DETAIL) { backStackEntry ->
             val songId = backStackEntry.arguments?.getString("songId")
 
             LaunchedEffect(songId) {
@@ -95,9 +96,9 @@ fun ZoLyricsNavHost(
             )
         }
 
-        composable("sets/create") { backStackEntry ->
+        composable(Routes.SET_CREATE) { backStackEntry ->
             val saveRequests = backStackEntry.savedStateHandle
-                .getStateFlow("fab_save_request", 0L)
+                .getStateFlow(Routes.KEY_FAB_SAVE_REQUEST, 0L)
             var onSaveClick: (() -> Unit)? = null
             setFabIcon(Icons.Default.Check)
             setFabClick { onSaveClick?.invoke() }
@@ -112,14 +113,15 @@ fun ZoLyricsNavHost(
             )
         }
 
-        composable("sets/{setId}") { backStackEntry ->
+        composable(Routes.SET_DETAIL) { backStackEntry ->
             val setId = backStackEntry.arguments?.getString("setId") ?: return@composable
 
             SetDetailScreen(
                 setId = setId,
                 onSongClick = { songId ->
-                    navController.navigate(Screen.SongDetail.createRoute(songId))
-                }
+                    navController.navigate(Routes.setRunner(setId, songId))
+                },
+                navController = navController
             )
         }
         composable(Screen.Search.route) {
@@ -127,12 +129,16 @@ fun ZoLyricsNavHost(
             SearchScreen(
                 onBack = { navController.popBackStack() },
                 onOpenSong = { songId ->
-                    navController.navigate("song/$songId")
+                    navController.navigate(Routes.songDetail(songId))
                 },
                 searchViewModel= searchViewModel
             )
         }
 
-
+        composable(Routes.SET_RUNNER) { backStackEntry ->
+            val setId = backStackEntry.arguments?.getString(Routes.ARG_SET_ID)!!
+            val startSongId = backStackEntry.arguments?.getString(Routes.ARG_START_SONG_ID)
+            SetRunnerScreen(setId = setId, startSongId = startSongId, onExit = { navController.popBackStack() })
+        }
     }
 }

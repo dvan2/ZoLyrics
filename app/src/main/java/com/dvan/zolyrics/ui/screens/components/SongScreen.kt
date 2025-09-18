@@ -40,9 +40,10 @@ import kotlin.math.abs
 @Composable
 fun SongScreen(
     song: Song, lyrics: List<LyricLine>,
+    showChips: Boolean = true,
+    contentPadding: PaddingValues = PaddingValues(16.dp)
 ) {
     val SectionsStartIndex = 2
-
 
     val prefsVm: PreferredKeyViewModel = hiltViewModel()
     val prefMap by prefsVm.map.collectAsState()
@@ -54,7 +55,6 @@ fun SongScreen(
     val scope = rememberCoroutineScope()
 
     var chipsHeightPx by remember { mutableStateOf(0) }
-
 
     val currentIndex by remember {
         derivedStateOf {
@@ -71,11 +71,10 @@ fun SongScreen(
         }
     }
 
-
     LazyColumn(
         state = listState,
         modifier = Modifier.fillMaxSize(),
-        contentPadding = PaddingValues(bottom = 24.dp)
+        contentPadding = contentPadding
     ) {
         // 0. Header (scrolls away)
         item {
@@ -96,28 +95,28 @@ fun SongScreen(
 
         }
 
-        stickyHeader("chips") {
-            Surface(
-                color = MaterialTheme.colorScheme.surface,
-                tonalElevation = 3.dp,
-                shadowElevation = 3.dp,
-                modifier = Modifier.onGloballyPositioned { chipsHeightPx = it.size.height } // <—
-            ) {
-                JumpToSectionChips(
-                    titles = sections.map { it.title },
-                    selectedIndex = currentIndex,
-                    onJump = { idx ->
-                        scope.launch {
-                            listState.animateScrollToItem(SectionsStartIndex +  idx, -chipsHeightPx)
+        if (showChips) {
+            stickyHeader("chips") {
+                Surface(
+                    color = MaterialTheme.colorScheme.surface,
+                    tonalElevation = 3.dp,
+                    shadowElevation = 3.dp,
+                    modifier = Modifier.onGloballyPositioned { chipsHeightPx = it.size.height } // <—
+                ) {
+                    JumpToSectionChips(
+                        titles = sections.map { it.title },
+                        selectedIndex = currentIndex,
+                        onJump = { idx ->
+                            scope.launch {
+                                listState.animateScrollToItem(SectionsStartIndex +  idx, -chipsHeightPx)
+                            }
                         }
-                    }
-                )
-                HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
+                    )
+                    HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
+                }
             }
         }
 
-
-        // 2. Sections
         itemsIndexed(sections, key = { i, s -> "${i}-${s.title}" }) { _, section ->
             LyricsSectionDisplay(section.title, section.lines)
             Spacer(Modifier.height(12.dp))
