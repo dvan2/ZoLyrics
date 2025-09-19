@@ -118,9 +118,6 @@ fun ZoLyricsNavHost(
 
             SetDetailScreen(
                 setId = setId,
-                onSongClick = { songId ->
-                    navController.navigate(Routes.setRunner(setId, songId))
-                },
                 navController = navController
             )
         }

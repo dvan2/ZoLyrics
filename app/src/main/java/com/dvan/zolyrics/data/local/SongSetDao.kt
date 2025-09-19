@@ -17,4 +17,7 @@ interface SongSetDao {
 
     @Query("DELETE FROM song_sets WHERE id = :setId")
     suspend fun deleteSetById(setId: String)
+
+    @Query("SELECT title FROM song_sets WHERE id = :setId LIMIT 1")
+    fun getSetTitle(setId: String): Flow<String?>
 }

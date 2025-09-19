@@ -82,4 +82,8 @@ class UserRepository(
     suspend fun removeSongFromSet(setId: String, songId: String) {
         setItemDao.deleteSongFromSet(setId, songId)
     }
+
+    fun getSetTitle(setId: String): Flow<String?> =
+        songSetDao.getSetTitle(setId)
+
 }

@@ -31,6 +31,7 @@ import com.dvan.zolyrics.ui.navigation.Screen
 import com.dvan.zolyrics.ui.navigation.ZoLyricsNavHost
 import com.dvan.zolyrics.ui.screens.components.LocalSnackbarHostState
 import com.dvan.zolyrics.ui.screens.components.ZoLyricsTopBar
+import com.dvan.zolyrics.ui.viewmodel.SongSetViewModel
 import com.dvan.zolyrics.ui.viewmodel.SongViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -40,6 +41,7 @@ fun ZoLyricsApp() {
     val currentBackStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = currentBackStackEntry?.destination?.route
     val viewModel: SongViewModel = hiltViewModel()
+    val songSetViewModel: SongSetViewModel = hiltViewModel()
 
     var onFabClick: (() -> Unit)? by remember { mutableStateOf(null) }
     var fabIcon: ImageVector? by remember { mutableStateOf(null) }
@@ -53,7 +55,7 @@ fun ZoLyricsApp() {
             containerColor = MaterialTheme.colorScheme.background,
             contentColor = MaterialTheme.colorScheme.onBackground,
             topBar = {
-                ZoLyricsTopBar(currentRoute, navController, viewModel)
+                ZoLyricsTopBar(currentRoute, navController, viewModel, songSetViewModel = songSetViewModel)
             },
             bottomBar = {
                 if (!isRunner) {
@@ -82,7 +84,7 @@ fun ZoLyricsApp() {
 @Composable
 fun FabForRoute(currentRoute: String?, navController: NavHostController) {
     when (currentRoute) {
-        Screen.Sets.route -> {
+        Routes.SETS -> {
             FloatingActionButton(onClick = { navController.navigate(Routes.SET_CREATE) }) {
                 Icon(Icons.Filled.Add, contentDescription = "Add Set")
             }

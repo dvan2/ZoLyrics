@@ -17,6 +17,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.navigation.NavHostController
 import com.dvan.zolyrics.R
 import com.dvan.zolyrics.ui.navigation.Screen
+import com.dvan.zolyrics.ui.viewmodel.SongSetViewModel
 import com.dvan.zolyrics.ui.viewmodel.SongViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -24,22 +25,34 @@ import com.dvan.zolyrics.ui.viewmodel.SongViewModel
 fun ZoLyricsTopBar(
     currentRoute: String?,
     navController: NavHostController,
-    viewModel: SongViewModel
+    viewModel: SongViewModel,
+    songSetViewModel: SongSetViewModel
 ) {
     TopAppBar(
         title = {
-            Text(
-                when {
-                    currentRoute == Screen.Home.route -> stringResource(R.string.app_name)
-                    currentRoute == Screen.Favorites.route -> stringResource(R.string.label_favorites)
-                    currentRoute == Screen.Sets.route -> stringResource(R.string.label_sets)
-                    currentRoute == "sets/create" -> stringResource(R.string.label_create_set)
-                    currentRoute?.startsWith("sets/") == true -> stringResource(R.string.label_set_details)
-                    currentRoute?.startsWith("song/") == true -> stringResource(R.string.label_song)
-                    currentRoute == Screen.Search.route -> stringResource(R.string.label_search)
-                    else -> stringResource(R.string.app_name)
+            val titleText: String = when {
+                currentRoute == Screen.Home.route -> stringResource(R.string.app_name)
+                currentRoute == Screen.Favorites.route -> stringResource(R.string.label_favorites)
+                currentRoute == Screen.Sets.route -> stringResource(R.string.label_sets)
+                currentRoute == "sets/create" -> stringResource(R.string.label_create_set)
+
+                // Set detail / runner: show set name if we have it
+                currentRoute?.startsWith("sets/") == true -> {
+                    val setId = navController.currentBackStackEntry?.arguments?.getString("setId")
+                    if (setId != null) {
+                        val setTitle by songSetViewModel.setTitle.collectAsState()
+                        setTitle ?: stringResource(R.string.label_set_details)
+                    } else {
+                        stringResource(R.string.label_set_details)
+                    }
                 }
-            )
+
+                currentRoute?.startsWith("song/") == true -> stringResource(R.string.label_song)
+                currentRoute == Screen.Search.route -> stringResource(R.string.label_search)
+                else -> stringResource(R.string.app_name)
+            }
+
+            Text(titleText)
         },
         navigationIcon = {
             val isTopLevel = currentRoute == Screen.Home.route ||

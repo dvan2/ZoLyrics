@@ -41,7 +41,6 @@ private val MUSICAL_KEYS_SHARPS = listOf("C","C#","D","D#","E","F","F#","G","G#"
 fun SetDetailScreen(
     setId: String,
     viewModel: SongSetViewModel = hiltViewModel(),
-    onSongClick: (String) -> Unit,
     navController: NavController
 ) {
     LaunchedEffect(setId) { viewModel.loadSongsForSet(setId) }

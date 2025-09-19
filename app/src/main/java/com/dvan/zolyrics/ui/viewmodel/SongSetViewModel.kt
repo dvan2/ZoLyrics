@@ -33,6 +33,18 @@ class SongSetViewModel @Inject constructor(
     private val _orderedSongs = MutableStateFlow<List<SongInSetUi>>(emptyList())
     val songsInSetUi: StateFlow<List<SongInSetUi>> = _orderedSongs
 
+
+    private val _setTitle = MutableStateFlow<String?>(null)
+    val setTitle: StateFlow<String?> = _setTitle
+
+    fun loadSetTitle(setId: String) {
+        viewModelScope.launch {
+            repository.getSetTitle(setId).collect { title ->
+                _setTitle.value = title
+            }
+        }
+    }
+
     fun persistSetOrder() {
         viewModelScope.launch {
             val setId = _currentSetId.value ?: return@launch
