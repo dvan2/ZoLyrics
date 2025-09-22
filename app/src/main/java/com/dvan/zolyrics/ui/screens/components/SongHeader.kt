@@ -1,6 +1,5 @@
 package com.dvan.zolyrics.ui.screens.components
 
-import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.FlowRow
@@ -32,32 +31,34 @@ fun SongHeaderWithPref(
 ) {
     var showPicker by remember { mutableStateOf(false) }
 
-    val spacing = LocalSpacing.current
-
     Column {
         Text(title, style = MaterialTheme.typography.titleLarge)
         Text("by $artist", style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
         Spacer(Modifier.height(LocalSpacing.current.md))
-        val meta = buildString {
-            (bpm ?: 0).takeIf { it > 0 }?.let { append("BPM $it") }
-            val effective = globalPreferredKey ?: originalKey
-            if (isNotEmpty()) append(" • ")
-            append("Key: $effective")
-            if (!originalKey.equals(effective, ignoreCase = true)) {
-                append(" (orig. $originalKey)")
+
+        FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            bpm?.takeIf { it > 0 }?.let {
+                AssistChip(
+                    onClick = { /* Non-interactive for now */ },
+                    label = { Text("BPM $it") }
+                )
             }
+
+            val effective = globalPreferredKey ?: originalKey
+            AssistChip(
+                onClick = { showPicker = true },
+                label = {
+                    Text(
+                        if (!originalKey.equals(effective, ignoreCase = true)) {
+                            "Key: $effective (orig. $originalKey)"
+                        } else {
+                            "Key: $effective"
+                        }
+                    )
+                }
+            )
         }
 
-        Text(
-            meta,
-            style = MaterialTheme.typography.labelSmall,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
-            modifier = Modifier
-                .combinedClickable(
-                    onClick = { showPicker = true },
-                    onLongClick = onClearGlobalPreferredKey
-                )
-        )
     }
 
     if (showPicker) {

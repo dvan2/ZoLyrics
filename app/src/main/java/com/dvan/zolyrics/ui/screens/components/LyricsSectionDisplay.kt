@@ -3,6 +3,7 @@ package com.dvan.zolyrics.ui.screens.components
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -29,7 +30,7 @@ fun LyricsSectionDisplay(
     val container = when {
         isChorus -> MaterialTheme.colorScheme.surfaceContainerHigh
         isBridge || isPre -> MaterialTheme.colorScheme.surfaceContainer
-        else -> null
+        else -> MaterialTheme.colorScheme.surfaceContainerLow
     }
     val accent = when {
         isChorus -> MaterialTheme.colorScheme.primary.copy(alpha = 0.24f)
@@ -40,11 +41,12 @@ fun LyricsSectionDisplay(
     Column(
         modifier = Modifier
             .padding(horizontal = 16.dp, vertical = 8.dp)
+            .fillMaxWidth()
             .then(
                 if (hasBlock) {
                     Modifier
                         .clip(MaterialTheme.shapes.medium)
-                        .background(container!!)
+                        .background(container)
                         .padding(start = 12.dp, top = 12.dp, end = 12.dp, bottom = 12.dp)
                         .drawBehind {
                             accent?.let {
@@ -66,7 +68,7 @@ fun LyricsSectionDisplay(
                 line.content,
                 style = MaterialTheme.typography.bodyLarge.copy(
                     fontSize = 18.sp,
-                    lineHeight = 26.sp
+                    lineHeight = 28.sp
                 )
             )
         }
