@@ -22,7 +22,7 @@ android {
 
     defaultConfig {
         applicationId = "com.dvan.zolyrics"
-        minSdk = 30
+        minSdk = 26
         targetSdk = 35
         versionCode = 4
         versionName = "1.0.3"
@@ -54,7 +54,7 @@ android {
 }
 
 dependencies {
-    val ktorVersion = "3.2.0"
+    val ktorVersion = "2.3.12"
     implementation(platform(libs.androidx.compose.bom))
 
     implementation("com.google.dagger:hilt-android:2.56.2")
@@ -80,20 +80,16 @@ dependencies {
 
     implementation(libs.kotlinx.serialization.json)
 
-    implementation(platform("io.github.jan-tennert.supabase:bom:3.2.0"))
-    implementation("io.github.jan-tennert.supabase:postgrest-kt")
+    implementation("io.github.jan-tennert.supabase:postgrest-kt:2.4.1")
 
     implementation("io.ktor:ktor-client-core:$ktorVersion")
-    implementation("io.ktor:ktor-client-okhttp:$ktorVersion")
+    implementation("io.ktor:ktor-client-android:$ktorVersion")
     implementation("io.ktor:ktor-client-content-negotiation:$ktorVersion")
     implementation("io.ktor:ktor-serialization-kotlinx-json:$ktorVersion")
 
     implementation("androidx.navigation:navigation-compose:2.7.7")
 
-    implementation("io.github.jan-tennert.supabase:postgrest-kt") {
-        exclude(group = "io.ktor", module = "ktor-client-core-jvm")
-    }
-
+    implementation("io.github.jan-tennert.supabase:postgrest-kt")
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
