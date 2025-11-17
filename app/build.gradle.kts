@@ -13,7 +13,7 @@ plugins {
 
 android {
     namespace = "com.dvan.zolyrics"
-    compileSdk = 35
+    compileSdk = 36
 
     val file = rootProject.file("local.properties")
     val properties = Properties()
@@ -54,16 +54,21 @@ android {
 }
 
 dependencies {
-    val ktorVersion = "2.3.12"
+    val room_version = "2.8.1"
+    val ktorVersion = "3.3.0"
+    val supabase_version = "3.2.3"
     implementation(platform(libs.androidx.compose.bom))
 
     implementation("com.google.dagger:hilt-android:2.56.2")
     ksp("com.google.dagger:hilt-android-compiler:2.56.2")
+
     implementation("androidx.hilt:hilt-navigation-compose:1.2.0")
 
-    implementation("androidx.room:room-runtime:${rootProject.extra["room_version"]}")
-    ksp("androidx.room:room-compiler:${rootProject.extra["room_version"]}")
-    implementation("androidx.room:room-ktx:${rootProject.extra["room_version"]}")
+    implementation("androidx.room:room-runtime:$room_version")
+    ksp("androidx.room:room-compiler:$room_version")
+    implementation("androidx.room:room-ktx:$room_version")
+    testImplementation("androidx.room:room-testing:$room_version")
+
     implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.6.1")
 
     implementation(libs.androidx.core.ktx)
@@ -80,7 +85,6 @@ dependencies {
 
     implementation(libs.kotlinx.serialization.json)
 
-    implementation("io.github.jan-tennert.supabase:postgrest-kt:2.4.1")
 
     implementation("io.ktor:ktor-client-core:$ktorVersion")
     implementation("io.ktor:ktor-client-android:$ktorVersion")
@@ -89,7 +93,9 @@ dependencies {
 
     implementation("androidx.navigation:navigation-compose:2.7.7")
 
+    implementation(platform("io.github.jan-tennert.supabase:bom:$supabase_version"))
     implementation("io.github.jan-tennert.supabase:postgrest-kt")
+
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
@@ -99,6 +105,5 @@ dependencies {
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
 
-    testImplementation("androidx.room:room-testing:${rootProject.extra["room_version"]}")
     testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.8.0")
 }
